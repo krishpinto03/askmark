@@ -51,10 +51,11 @@ body{background:var(--bg);color:var(--cream);font-family:'Syne',sans-serif;overf
 #topnav{background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;height:48px;gap:4px;flex-shrink:0;}
 #proj-title{font-family:'Playfair Display',serif;font-size:15px;color:var(--cream);margin-right:14px;white-space:nowrap;}
 #proj-title em{color:var(--red);font-style:italic;}
-.ntab{padding:6px 12px;font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;height:48px;display:flex;align-items:center;transition:all 0.15s;white-space:nowrap;user-select:none;}
+.ntab{padding:6px 12px;font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;height:48px;display:flex;align-items:center;gap:6px;transition:all 0.15s;white-space:nowrap;user-select:none;}
 .ntab:hover{color:var(--cream2);}
 .ntab.active{color:var(--cream);border-bottom-color:var(--red);}
-.ntab.soon{opacity:0.3;cursor:default;}
+.ntab.soon{opacity:0.4;cursor:not-allowed;}
+.soon-pill{font-size:7px;background:var(--s3);color:var(--muted);padding:2px 5px;border-radius:2px;letter-spacing:0.05em;font-weight:600;}
 .nav-sp{flex:1;}
 #status-badge{font-size:9px;font-family:'DM Mono',monospace;padding:3px 8px;background:rgba(52,168,83,0.15);color:#4CAF50;letter-spacing:0.06em;}
 /* SHARE */
@@ -159,20 +160,21 @@ textarea::placeholder{color:var(--muted);}
 .btn-ghost:hover{border-color:var(--red);color:var(--cream);}
 
 /* MARK BAR */
-#mark-bar{background:var(--s1);border-top:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
-#mark-plus{width:30px;height:30px;background:var(--s2);border:1px solid var(--border2);color:var(--cream2);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all 0.15s;position:relative;}
+#mark-bar{background:var(--s1);border-top:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+#mark-av-bar{width:36px;height:36px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-style:italic;font-size:16px;color:white;flex-shrink:0;}
+#mark-plus{width:32px;height:32px;background:var(--s2);border:1px solid var(--border2);color:var(--cream2);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all 0.15s;position:relative;}
 #mark-plus:hover{border-color:var(--red);color:var(--cream);}
 #plus-menu{position:absolute;bottom:calc(100% + 8px);left:0;width:180px;background:var(--s1);border:1px solid var(--border2);display:none;flex-direction:column;box-shadow:0 -8px 24px rgba(0,0,0,0.5);}
 #plus-menu.open{display:flex;}
 .pm-item{padding:10px 14px;font-size:11px;color:var(--cream2);cursor:pointer;display:flex;align-items:center;gap:9px;transition:background 0.15s;border-bottom:1px solid var(--border);}
 .pm-item:last-child{border-bottom:none;}
 .pm-item:hover{background:var(--s2);color:var(--cream);}
-#mark-input-wrap{flex:1;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;padding:0 12px;gap:8px;}
-#mark-input-wrap:focus-within{border-color:rgba(200,51,10,0.4);}
-#mark-m-label{font-family:'Playfair Display',serif;font-size:11px;font-style:italic;color:var(--red);flex-shrink:0;}
-#mark-input{flex:1;background:transparent;border:none;color:var(--cream);font-family:'Syne',sans-serif;font-size:12px;padding:9px 0;outline:none;}
+#mark-input-wrap{flex:1;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:10px;}
+#mark-input-wrap:focus-within{border-color:rgba(200,51,10,0.5);box-shadow:0 0 0 3px rgba(200,51,10,0.06);}
+#mark-m-label{font-family:'Playfair Display',serif;font-size:13px;font-style:italic;color:var(--red);flex-shrink:0;border-right:1px solid var(--border);padding-right:10px;}
+#mark-input{flex:1;background:transparent;border:none;color:var(--cream);font-family:'Syne',sans-serif;font-size:13px;padding:12px 0;outline:none;}
 #mark-input::placeholder{color:var(--muted);}
-#mark-send{width:32px;height:32px;background:var(--red);border:none;color:white;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background 0.15s;}
+#mark-send{width:38px;height:38px;background:var(--red);border:none;color:white;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background 0.15s;border-radius:2px;}
 #mark-send:hover{background:#a82808;}
 
 /* MARK CHAT PANEL */
@@ -237,9 +239,9 @@ textarea::placeholder{color:var(--muted);}
       <div class="ntab active" onclick="switchTab(this,'dashboard')">Dashboard</div>
       <div class="ntab" onclick="switchTab(this,'budget')">Budget</div>
       <div class="ntab" onclick="switchTab(this,'crew')">Crew</div>
-      <div class="ntab soon" title="Coming soon">Call Sheets</div>
-      <div class="ntab soon" title="Coming soon">Locations</div>
-      <div class="ntab soon" title="Coming soon">Schedule</div>
+      <div class="ntab soon">Call Sheets<span class="soon-pill">Soon</span></div>
+      <div class="ntab soon">Locations<span class="soon-pill">Soon</span></div>
+      <div class="ntab soon">Schedule<span class="soon-pill">Soon</span></div>
       <div class="nav-sp"></div>
       <div id="status-badge">● Pre-Production</div>
       <div id="share-wrap">
@@ -395,6 +397,7 @@ textarea::placeholder{color:var(--muted);}
 
     <!-- MARK BAR -->
     <div id="mark-bar">
+      <div id="mark-av-bar">M</div>
       <div id="mark-plus" onclick="togglePlus()">
         +
         <div id="plus-menu">
@@ -406,7 +409,7 @@ textarea::placeholder{color:var(--muted);}
       </div>
       <div id="mark-input-wrap">
         <span id="mark-m-label">Mark</span>
-        <input type="text" id="mark-input" placeholder="Ask Mark anything about this production..." onkeydown="handleKey(event)" onfocus="openMarkPanel()"/>
+        <input type="text" id="mark-input" placeholder="Ask Mark anything — budget, crew, tasks, dates..." onkeydown="handleKey(event)" onfocus="openMarkPanel()"/>
       </div>
       <button id="mark-send" onclick="sendMsg()">→</button>
     </div>
