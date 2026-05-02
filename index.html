@@ -109,6 +109,31 @@ footer{padding:40px;border-top:1px solid var(--border);display:flex;align-items:
 .footer-copy{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;}
 .footer-email a{font-size:12px;color:var(--muted);text-decoration:none;transition:color 0.2s;}
 .footer-email a:hover{color:var(--red);}
+
+@media(max-width:768px){
+  nav{padding:16px 20px;}
+  .nav-links a:not(.nav-cta){display:none;}
+  .nav-cta{padding:8px 14px;font-size:11px;}
+  .hero{padding:90px 20px 60px;min-height:auto;}
+  .hero-title{font-size:clamp(40px,12vw,72px);}
+  .hero-ctas{flex-direction:column;align-items:flex-start;gap:14px;}
+  .btn-primary{width:100%;text-align:center;padding:16px 24px!important;font-size:14px!important;}
+  .btn-secondary{font-size:13px;}
+  .marquee-item{font-size:10px;}
+  section{padding:60px 20px;}
+  .how-steps{grid-template-columns:1fr;gap:16px;}
+  .features-grid{grid-template-columns:1fr 1fr;gap:12px;}
+  .feature-card{padding:18px;}
+  .integrations-hub{gap:12px;}
+  .integration-cards{gap:8px;}
+  .int-card{padding:10px 14px;font-size:12px;}
+  .wishes-grid{gap:0;}
+  .wish-text{font-size:clamp(16px,5vw,26px);}
+  .final-cta{padding:60px 20px;}
+  .cta-watermark{font-size:clamp(60px,18vw,140px);margin-bottom:-20px;}
+  footer{flex-direction:column;gap:12px;text-align:center;padding:28px 20px;}
+  .section-title{font-size:clamp(28px,8vw,52px);}
+}
 </style>
 </head>
 <body>
