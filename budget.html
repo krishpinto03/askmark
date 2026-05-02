@@ -438,9 +438,9 @@ Generate the complete itemised Mumbai production budget.`;
 
 // ── CLAUDE API CALL ───────────────────────────────────────────────────────────
 async function callClaude(apiKey, system, user, maxTokens = 3000) {
-  // Try backend proxy first (works when running via localhost — no key needed)
+  // Use Vercel proxy — API key is stored server-side, no key needed from user
   try {
-    const proxyResp = await fetch('/claude', {
+    const proxyResp = await fetch('https://askmark-proxy.vercel.app/api/claude', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ system, user, max_tokens: maxTokens })
@@ -449,7 +449,9 @@ async function callClaude(apiKey, system, user, maxTokens = 3000) {
       const data = await proxyResp.json();
       return data.content[0].text;
     }
-  } catch(e) { /* not on local server, fall through */ }
+    const err = await proxyResp.json();
+    throw new Error(err.error?.message || 'Server error');
+  } catch(e) { throw e; }
 
   // Fallback: direct browser call using entered API key
   if(!apiKey) throw new Error('No API key — please enter one above');
