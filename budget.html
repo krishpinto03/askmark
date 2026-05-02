@@ -152,7 +152,7 @@ input[type=file]{display:none;}
       <div style="font-size:10px;color:var(--muted);margin-bottom:10px;line-height:1.5;">This is what powers Mark's brain. Get yours free at <a href="https://console.anthropic.com" target="_blank" style="color:var(--red);">console.anthropic.com</a> — it costs pennies per budget generated.</div>
       <div class="api-row">
         <label>API Key</label>
-        <input type="password" id="api-key" placeholder="sk-ant-api03-..." />
+        <input type="password" id="api-key" placeholder="sk-ant-api03-..." oninput="localStorage.setItem('mark_api_key', this.value)" />
       </div>
     </div>
 
@@ -254,6 +254,10 @@ input[type=file]{display:none;}
 </div>
 
 <script>
+// ── RESTORE SAVED API KEY ─────────────────────────────────────────────────────
+const savedKey = localStorage.getItem('mark_api_key');
+if(savedKey) document.getElementById('api-key').value = savedKey;
+
 // ── DEMO BRIEFS ────────────────────────────────────────────────────────────────
 const demos = {
   tvc: "Nike 60-second TVC. Production type: brand film / commercial. 3 shoot days in Mumbai. Locations: Bandra sea-face (exterior, golden hour), Dharavi lanes (exterior, high energy), and a basketball court in Andheri (interior/exterior). Principal cast: 2 professional athletes and 1 senior coach character. Supporting cast: approximately 20 young players. No stunts. Handheld camera, fast edit. Bilingual Hindi-English. Estimated crew: 35 people. No celebrity talent attached yet.",
