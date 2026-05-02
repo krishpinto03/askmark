@@ -301,7 +301,7 @@ async function startFlow() {
   const apiKey = document.getElementById('api-key').value.trim();
   scriptText = document.getElementById('script-text').value.trim();
 
-  if(!apiKey) { showError('Please enter your Anthropic API key above. Get one free at console.anthropic.com'); return; }
+  // API key only needed if not using the backend proxy
   if(scriptText.length < 30) { showError('Please paste your script or brief — the more detail the better.'); return; }
 
   hideError();
@@ -438,6 +438,21 @@ Generate the complete itemised Mumbai production budget.`;
 
 // ── CLAUDE API CALL ───────────────────────────────────────────────────────────
 async function callClaude(apiKey, system, user, maxTokens = 3000) {
+  // Try backend proxy first (works when running via localhost — no key needed)
+  try {
+    const proxyResp = await fetch('/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ system, user, max_tokens: maxTokens })
+    });
+    if(proxyResp.ok) {
+      const data = await proxyResp.json();
+      return data.content[0].text;
+    }
+  } catch(e) { /* not on local server, fall through */ }
+
+  // Fallback: direct browser call using entered API key
+  if(!apiKey) throw new Error('No API key — please enter one above');
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
