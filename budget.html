@@ -27,26 +27,34 @@ body{background:var(--bg);color:var(--cream);font-family:'Syne',sans-serif;min-h
 .step{display:none;}
 .step.active{display:block;}
 
+/* STEP INDICATOR */
+.step-indicator{display:flex;align-items:center;gap:0;margin-bottom:32px;}
+.si-item{display:flex;align-items:center;gap:8px;font-size:11px;font-family:'DM Mono',monospace;}
+.si-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+.si-item.active .si-num{background:var(--red);color:white;}
+.si-item.done .si-num{background:#2E7D32;color:white;}
+.si-item.inactive .si-num{background:var(--s3);color:var(--muted);}
+.si-item.active .si-label{color:var(--cream);}
+.si-item.done .si-label{color:var(--cream2);}
+.si-item.inactive .si-label{color:var(--muted);}
+.si-line{flex:1;height:1px;background:var(--border);margin:0 12px;min-width:24px;}
+
 /* STEP 1 */
 .panel{background:var(--s1);border:1px solid var(--border);padding:20px;margin-bottom:16px;}
 .panel-title{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:12px;}
 textarea{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--cream2);font-family:'DM Mono',monospace;font-size:12px;padding:12px;resize:vertical;min-height:140px;outline:none;line-height:1.7;}
 textarea:focus{border-color:rgba(200,51,10,0.4);}
 textarea::placeholder{color:var(--muted);}
-.upload-zone{border:1px dashed rgba(200,51,10,0.4);background:var(--red-dim);padding:28px;text-align:center;margin-bottom:16px;cursor:pointer;transition:all 0.2s;}
+.upload-zone{border:2px dashed rgba(200,51,10,0.35);background:rgba(200,51,10,0.04);padding:48px 28px;text-align:center;margin-bottom:16px;cursor:pointer;transition:all 0.2s;border-radius:2px;}
 .upload-zone:hover{border-color:var(--red);background:rgba(200,51,10,0.08);}
 input[type=file]{display:none;}
-.btn-red{background:var(--red);border:none;color:white;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:12px 22px;cursor:pointer;transition:background 0.15s;}
+.btn-red{background:var(--red);border:none;color:white;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:14px 28px;cursor:pointer;transition:background 0.15s;}
 .btn-red:hover{background:#a82808;}
 .btn-ghost{background:var(--s2);border:1px solid var(--border2);color:var(--cream2);font-family:'Syne',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:11px 18px;cursor:pointer;transition:all 0.15s;}
 .btn-ghost:hover{border-color:var(--red);color:var(--cream);}
 .demo-btns{display:flex;flex-wrap:wrap;gap:8px;}
-
-/* API KEY */
-.api-row{display:flex;gap:10px;align-items:center;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
-.api-row input{flex:1;background:var(--s2);border:1px solid var(--border);color:var(--cream);font-family:'DM Mono',monospace;font-size:11px;padding:8px 12px;outline:none;}
-.api-row input:focus{border-color:rgba(200,51,10,0.4);}
-.api-row label{font-size:10px;color:var(--muted);white-space:nowrap;}
+.or-divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:10px;font-family:'DM Mono',monospace;letter-spacing:0.1em;}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border);}
 
 /* STEP 2 - QUESTIONS */
 .mark-intro{background:var(--red-dim);border:1px solid rgba(200,51,10,0.2);padding:16px;margin-bottom:20px;display:flex;gap:12px;}
@@ -147,46 +155,58 @@ input[type=file]{display:none;}
 
   <!-- STEP 1: INPUT -->
   <div class="step active" id="step1">
-    <div class="panel">
-      <div class="panel-title">Your Anthropic API Key</div>
-      <div style="font-size:10px;color:var(--muted);margin-bottom:10px;line-height:1.5;">This is what powers Mark's brain. Get yours free at <a href="https://console.anthropic.com" target="_blank" style="color:var(--red);">console.anthropic.com</a> — it costs pennies per budget generated.</div>
-      <div class="api-row">
-        <label>API Key</label>
-        <input type="password" id="api-key" placeholder="sk-ant-api03-..." oninput="localStorage.setItem('mark_api_key', this.value)" />
-      </div>
+
+    <!-- Step indicator -->
+    <div class="step-indicator">
+      <div class="si-item active"><div class="si-num">1</div><div class="si-label">Add your script</div></div>
+      <div class="si-line"></div>
+      <div class="si-item inactive"><div class="si-num">2</div><div class="si-label">Answer questions</div></div>
+      <div class="si-line"></div>
+      <div class="si-item inactive"><div class="si-num">3</div><div class="si-label">Get your budget</div></div>
     </div>
 
+    <!-- Upload hero -->
     <div class="upload-zone" id="upload-zone" onclick="document.getElementById('script-upload').click()">
       <input type="file" id="script-upload" accept=".pdf,.txt,.fdx,.fountain" onchange="handleFile(this)"/>
-      <div id="upload-icon" style="font-size:24px;margin-bottom:8px;">⬆</div>
-      <div id="upload-title" style="font-size:13px;font-weight:600;color:var(--cream);margin-bottom:4px;">Drop your script here</div>
-      <div id="upload-sub" style="font-size:10px;color:var(--muted);">or click to browse — PDF · FDX · FOUNTAIN · TXT</div>
+      <div id="upload-icon" style="font-size:36px;margin-bottom:12px;">📄</div>
+      <div id="upload-title" style="font-size:16px;font-weight:700;color:var(--cream);margin-bottom:6px;">Upload your script</div>
+      <div id="upload-sub" style="font-size:12px;color:var(--muted);">Click to browse · PDF · FDX · FOUNTAIN · TXT</div>
     </div>
 
+    <div class="or-divider">or type / paste your brief below</div>
+
     <div class="panel">
-      <div class="panel-title">Or paste script / brief directly</div>
-      <textarea id="script-text" placeholder="Paste your script, treatment or production brief here.&#10;&#10;Even a rough paragraph works. Examples:&#10;&#10;'Nike 60-second TVC. 3 shoot days. Mumbai — Bandra sea-face, Dharavi lanes, Andheri basketball court. 2 athlete principals + 1 coach. ~20 background players. Handheld camera. No stunts. Bilingual Hindi-English.'&#10;&#10;'Hindi action film. 60-day shoot. Mumbai + 5 days Rajasthan. Principal cast of 4. Car chases, moderate stunts. 3 song sequences with choreography. VFX: city backdrop extensions.'"></textarea>
-      <div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-        <button class="btn-red" onclick="startFlow()">Read Script & Ask Questions →</button>
-        <span style="font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;">Mark will ask ~6 questions before generating</span>
+      <textarea id="script-text" placeholder="Describe your production in plain English. Even a rough paragraph works.&#10;&#10;Example: 'Nike 60-second TVC. 3 shoot days in Mumbai — Bandra sea-face, Dharavi lanes, Andheri basketball court. 2 athlete leads, 1 coach, ~20 background players. No stunts. Handheld camera.'"></textarea>
+      <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        <button class="btn-red" onclick="startFlow()">Build My Budget →</button>
+        <span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;">Mark will ask a few quick questions first</span>
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-title">Or try a demo brief</div>
+    <!-- Demo briefs -->
+    <div style="margin-top:8px;">
+      <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:10px;letter-spacing:0.08em;">NO SCRIPT? TRY A DEMO:</div>
       <div class="demo-btns">
-        <button class="btn-ghost" onclick="loadDemo('tvc')">Nike TVC — 3 day Mumbai</button>
-        <button class="btn-ghost" onclick="loadDemo('music')">Music Video — 2 day</button>
-        <button class="btn-ghost" onclick="loadDemo('ott')">OTT Drama — 30 day</button>
-        <button class="btn-ghost" onclick="loadDemo('film')">Bollywood Film — 60 day</button>
+        <button class="btn-ghost" onclick="loadDemo('tvc')">🎬 Nike TVC — 3 days</button>
+        <button class="btn-ghost" onclick="loadDemo('music')">🎵 Music Video — 2 days</button>
+        <button class="btn-ghost" onclick="loadDemo('ott')">📺 OTT Drama — 30 days</button>
+        <button class="btn-ghost" onclick="loadDemo('film')">🎥 Bollywood Film — 60 days</button>
       </div>
     </div>
 
-    <div id="error-display" style="display:none;" class="error-msg"></div>
+    <input type="hidden" id="api-key" />
+    <div id="error-display" style="display:none;margin-top:16px;" class="error-msg"></div>
   </div>
 
   <!-- STEP 2: QUESTIONS -->
   <div class="step" id="step2">
+    <div class="step-indicator" style="margin-bottom:32px;">
+      <div class="si-item done"><div class="si-num">1</div><div class="si-label">Script added</div></div>
+      <div class="si-line"></div>
+      <div class="si-item active"><div class="si-num">2</div><div class="si-label">Answer questions</div></div>
+      <div class="si-line"></div>
+      <div class="si-item inactive"><div class="si-num">3</div><div class="si-label">Get your budget</div></div>
+    </div>
     <div class="mark-intro">
       <div class="mark-av">M</div>
       <div class="intro-text" id="intro-text">Loading...</div>
@@ -202,6 +222,13 @@ input[type=file]{display:none;}
 
   <!-- STEP 3: GENERATING -->
   <div class="step" id="step3">
+    <div class="step-indicator" style="margin-bottom:32px;">
+      <div class="si-item done"><div class="si-num">1</div><div class="si-label">Script added</div></div>
+      <div class="si-line"></div>
+      <div class="si-item done"><div class="si-num">2</div><div class="si-label">Questions answered</div></div>
+      <div class="si-line"></div>
+      <div class="si-item active"><div class="si-num">3</div><div class="si-label">Building budget</div></div>
+    </div>
     <div class="generating">
       <div class="gen-av">M</div>
       <div class="gen-title">Mark is building your budget</div>
