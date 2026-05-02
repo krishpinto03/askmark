@@ -156,11 +156,11 @@ input[type=file]{display:none;}
       </div>
     </div>
 
-    <div class="upload-zone" onclick="document.getElementById('script-upload').click()">
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('script-upload').click()">
       <input type="file" id="script-upload" accept=".pdf,.txt,.fdx,.fountain" onchange="handleFile(this)"/>
-      <div style="font-size:24px;margin-bottom:8px;">⬆</div>
-      <div style="font-size:13px;font-weight:600;color:var(--cream);margin-bottom:4px;">Drop your script here</div>
-      <div style="font-size:10px;color:var(--muted);">or click to browse — PDF · FDX · FOUNTAIN · TXT</div>
+      <div id="upload-icon" style="font-size:24px;margin-bottom:8px;">⬆</div>
+      <div id="upload-title" style="font-size:13px;font-weight:600;color:var(--cream);margin-bottom:4px;">Drop your script here</div>
+      <div id="upload-sub" style="font-size:10px;color:var(--muted);">or click to browse — PDF · FDX · FOUNTAIN · TXT</div>
     </div>
 
     <div class="panel">
@@ -276,6 +276,14 @@ function handleFile(input) {
     } else {
       document.getElementById('script-text').value = '[File uploaded: ' + file.name + ' — Mark will analyse this script]';
     }
+    const zone = document.getElementById('upload-zone');
+    zone.style.borderColor = '#2E7D32';
+    zone.style.background = 'rgba(46,125,50,0.1)';
+    document.getElementById('upload-icon').textContent = '✓';
+    document.getElementById('upload-icon').style.color = '#4CAF50';
+    document.getElementById('upload-title').textContent = 'Script uploaded';
+    document.getElementById('upload-title').style.color = '#4CAF50';
+    document.getElementById('upload-sub').textContent = file.name;
   }
 }
 
