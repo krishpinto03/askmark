@@ -148,10 +148,13 @@ input[type=file]{display:none;}
 </head>
 <body>
 <div id="app">
-  <button class="back-btn" onclick="window.location.href='/app.html'">← Back to Dashboard</button>
-  <div class="eyebrow">02 · Budget</div>
-  <div class="pg-title">Script → Budget</div>
-  <div class="pg-sub">Paste your script or brief. Mark asks smart questions. Real Mumbai budget comes out.</div>
+  <button class="back-btn" onclick="window.location.href='index.html'">← Back to home</button>
+
+  <div style="text-align:center;padding:20px 0 36px;">
+    <div style="width:52px;height:52px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-style:italic;font-size:24px;color:white;margin:0 auto 16px;">M</div>
+    <div style="font-family:'Playfair Display',serif;font-size:28px;color:var(--cream);margin-bottom:8px;">Script to Budget</div>
+    <div style="font-size:14px;color:var(--cream2);max-width:480px;margin:0 auto;line-height:1.6;">Give Mark your script or a rough brief — he'll ask a few quick questions and generate a full itemised Mumbai budget in under a minute.</div>
+  </div>
 
   <!-- STEP 1: INPUT -->
   <div class="step active" id="step1">
@@ -165,32 +168,34 @@ input[type=file]{display:none;}
       <div class="si-item inactive"><div class="si-num">3</div><div class="si-label">Get your budget</div></div>
     </div>
 
-    <!-- Upload hero -->
-    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('script-upload').click()">
-      <input type="file" id="script-upload" accept=".pdf,.txt,.fdx,.fountain" onchange="handleFile(this)"/>
-      <div id="upload-icon" style="font-size:36px;margin-bottom:12px;">📄</div>
-      <div id="upload-title" style="font-size:16px;font-weight:700;color:var(--cream);margin-bottom:6px;">Upload your script</div>
-      <div id="upload-sub" style="font-size:12px;color:var(--muted);">Click to browse · PDF · FDX · FOUNTAIN · TXT</div>
-    </div>
-
-    <div class="or-divider">or type / paste your brief below</div>
-
-    <div class="panel">
-      <textarea id="script-text" placeholder="Describe your production in plain English. Even a rough paragraph works.&#10;&#10;Example: 'Nike 60-second TVC. 3 shoot days in Mumbai — Bandra sea-face, Dharavi lanes, Andheri basketball court. 2 athlete leads, 1 coach, ~20 background players. No stunts. Handheld camera.'"></textarea>
-      <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-        <button class="btn-red" onclick="startFlow()">Build My Budget →</button>
-        <span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;">Mark will ask a few quick questions first</span>
-      </div>
-    </div>
-
-    <!-- Demo briefs -->
-    <div style="margin-top:8px;">
-      <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:10px;letter-spacing:0.08em;">NO SCRIPT? TRY A DEMO:</div>
+    <!-- Demo briefs — first thing users see -->
+    <div class="panel" style="margin-bottom:16px;">
+      <div style="font-size:11px;color:var(--cream2);margin-bottom:12px;font-weight:600;">No script yet? Start with a demo:</div>
       <div class="demo-btns">
         <button class="btn-ghost" onclick="loadDemo('tvc')">🎬 Nike TVC — 3 days</button>
         <button class="btn-ghost" onclick="loadDemo('music')">🎵 Music Video — 2 days</button>
         <button class="btn-ghost" onclick="loadDemo('ott')">📺 OTT Drama — 30 days</button>
         <button class="btn-ghost" onclick="loadDemo('film')">🎥 Bollywood Film — 60 days</button>
+      </div>
+    </div>
+
+    <div class="or-divider">or add your own script</div>
+
+    <!-- Upload zone -->
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('script-upload').click()">
+      <input type="file" id="script-upload" accept=".pdf,.txt,.fdx,.fountain" onchange="handleFile(this)"/>
+      <div id="upload-icon" style="font-size:32px;margin-bottom:10px;">📄</div>
+      <div id="upload-title" style="font-size:15px;font-weight:700;color:var(--cream);margin-bottom:4px;">Upload your script</div>
+      <div id="upload-sub" style="font-size:11px;color:var(--muted);">Click to browse · PDF · FDX · FOUNTAIN · TXT</div>
+    </div>
+
+    <div class="or-divider">or paste a brief below</div>
+
+    <div class="panel">
+      <textarea id="script-text" placeholder="Describe your shoot in plain English — type, locations, crew size, shoot days. Even one sentence works.&#10;&#10;e.g. 'Nike TVC. 3 days in Mumbai. 2 athletes, 1 coach, 20 extras. No stunts. Handheld camera.'"></textarea>
+      <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        <button class="btn-red" onclick="startFlow()">Build My Budget →</button>
+        <span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;">Mark asks a few questions first</span>
       </div>
     </div>
 
