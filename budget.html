@@ -66,6 +66,9 @@ input[type=file]{display:none;}
 .demo-btns{display:flex;flex-wrap:wrap;gap:8px;}
 .or-divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:10px;font-family:'DM Mono',monospace;letter-spacing:0.1em;}
 .or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.input-section{transition:opacity 0.25s;}
+.input-section.dimmed{opacity:0.28;}
+.btn-red.disabled{opacity:0.35;pointer-events:none;cursor:default;}
 
 /* STEP 2 - QUESTIONS */
 .mark-intro{background:var(--red-dim);border:1px solid rgba(200,51,10,0.2);padding:16px;margin-bottom:20px;display:flex;gap:12px;}
@@ -285,7 +288,7 @@ input[type=file]{display:none;}
     </div>
 
     <!-- Upload zone — first -->
-    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('script-upload').click()">
+    <div class="upload-zone input-section" id="upload-zone" onclick="document.getElementById('script-upload').click(); setActiveInput('upload')">
       <input type="file" id="script-upload" accept=".pdf" onchange="handleFile(this)"/>
       <div id="upload-icon" style="font-size:32px;margin-bottom:10px;">📄</div>
       <div id="upload-title" style="font-size:15px;font-weight:700;color:var(--cream);margin-bottom:4px;">Upload your script</div>
@@ -295,7 +298,7 @@ input[type=file]{display:none;}
     <div class="or-divider">or try a demo brief</div>
 
     <!-- Demo briefs -->
-    <div class="panel" style="margin-bottom:16px;">
+    <div class="panel input-section" id="demo-section" style="margin-bottom:16px;">
       <div style="font-size:11px;color:var(--cream2);margin-bottom:12px;font-weight:600;">No script yet? Start with a demo:</div>
       <div class="demo-btns">
         <button class="btn-ghost" onclick="loadDemo('tvc')">🎬 Nike TVC — 3 days</button>
@@ -307,12 +310,13 @@ input[type=file]{display:none;}
 
     <div class="or-divider">or paste a brief below</div>
 
-    <div class="panel">
-      <textarea id="script-text" placeholder="Describe your shoot in plain English — type, locations, crew size, shoot days. Even one sentence works.&#10;&#10;e.g. 'Nike TVC. 3 shoot days. 2 athletes, 1 coach, 20 extras. No stunts. Handheld camera.'"></textarea>
-      <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
-        <button class="btn-red" onclick="startFlow()">Build My Budget →</button>
-        <span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;">Mark asks a few questions first</span>
-      </div>
+    <div class="panel input-section" id="paste-section">
+      <textarea id="script-text" oninput="setActiveInput('paste')" placeholder="Describe your shoot in plain English — type, locations, crew size, shoot days. Even one sentence works.&#10;&#10;e.g. 'Nike TVC. 3 shoot days. 2 athletes, 1 coach, 20 extras. No stunts. Handheld camera.'"></textarea>
+    </div>
+
+    <div style="margin-top:20px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+      <button class="btn-red disabled" id="build-btn" onclick="startFlow()">Build My Budget →</button>
+      <span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;">Mark asks a few questions first</span>
     </div>
 
     <input type="hidden" id="api-key" />
@@ -464,6 +468,7 @@ function proceedFromMarket() {
       currencyLabel: sym + ' ' + code + ' — ' + industry,
     };
   }
+  resetInputSections();
   goTo('step1');
 }
 
@@ -481,6 +486,7 @@ const demos = {
 
 function loadDemo(type) {
   document.getElementById('script-text').value = demos[type];
+  setActiveInput('demo');
 }
 
 function handleFile(input) {
@@ -495,6 +501,7 @@ function handleFile(input) {
     document.getElementById('upload-title').textContent = 'Script uploaded';
     document.getElementById('upload-title').style.color = '#4CAF50';
     document.getElementById('upload-sub').textContent = file.name;
+    setActiveInput('upload');
   }
 }
 
@@ -502,6 +509,28 @@ function handleFile(input) {
 let scriptText = '';
 let answers = {};
 let budgetData = null;
+let activeInput = null;
+
+function setActiveInput(type) {
+  activeInput = type;
+  const ids = { upload: 'upload-zone', demo: 'demo-section', paste: 'paste-section' };
+  Object.entries(ids).forEach(([key, id]) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('dimmed', key !== type);
+  });
+  const btn = document.getElementById('build-btn');
+  if (btn) btn.classList.remove('disabled');
+}
+
+function resetInputSections() {
+  activeInput = null;
+  ['upload-zone', 'demo-section', 'paste-section'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('dimmed');
+  });
+  const btn = document.getElementById('build-btn');
+  if (btn) btn.classList.add('disabled');
+}
 
 // ── FLOW ──────────────────────────────────────────────────────────────────────
 function goTo(id) {
@@ -534,6 +563,7 @@ function startOver() {
   document.getElementById('upload-title').textContent = 'Upload your script';
   document.getElementById('upload-title').style.color = '';
   document.getElementById('upload-sub').textContent = 'Click to browse · PDF only';
+  resetInputSections();
   goTo('step0');
 }
 
@@ -596,34 +626,6 @@ function renderQuestions(questions, container) {
     `;
     container.appendChild(block);
   });
-}
-
-function selectOpt(el, qid) {
-  const opts = el.closest('.q-opts');
-  const isMulti = opts.dataset.multi === 'true';
-  const isOther = el.dataset.val === 'Other';
-  const otherDiv = document.getElementById('other-' + qid);
-
-  if (isMulti) {
-    el.classList.toggle('sel');
-    const otherOpt = opts.querySelector('.q-other-opt');
-    if (otherOpt && otherOpt.classList.contains('sel')) {
-      otherDiv.style.display = 'block';
-    } else {
-      otherDiv.style.display = 'none';
-    }
-    updateMultiAnswer(qid, opts, otherDiv);
-  } else {
-    opts.querySelectorAll('.q-opt').forEach(o => o.classList.remove('sel'));
-    el.classList.add('sel');
-    if (isOther) {
-      otherDiv.style.display = 'block';
-      answers[qid] = otherDiv.querySelector('input').value || '';
-    } else {
-      otherDiv.style.display = 'none';
-      answers[qid] = el.dataset.val;
-    }
-  }
 }
 
 function setOtherAnswer(qid, val) {
