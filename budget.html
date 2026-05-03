@@ -178,7 +178,7 @@ input[type=file]{display:none;}
   <div style="text-align:center;padding:20px 0 36px;">
     <div style="width:52px;height:52px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-style:italic;font-size:24px;color:white;margin:0 auto 16px;">M</div>
     <div style="font-family:'Playfair Display',serif;font-size:28px;color:var(--cream);margin-bottom:8px;">Script to Budget</div>
-    <div style="font-size:14px;color:var(--cream2);max-width:480px;margin:0 auto;line-height:1.6;">Give Mark your script or a rough brief — he'll ask a few quick questions and generate a full itemised Mumbai budget in under a minute.</div>
+    <div style="font-size:14px;color:var(--cream2);max-width:480px;margin:0 auto;line-height:1.6;">Give Mark your script or a rough brief — he'll ask a few smart questions and generate a full itemised production budget in under a minute.</div>
   </div>
 
   <!-- STEP 1: INPUT -->
@@ -193,31 +193,31 @@ input[type=file]{display:none;}
       <div class="si-item inactive"><div class="si-num">3</div><div class="si-label">Get your budget</div></div>
     </div>
 
-    <!-- Demo briefs — first thing users see -->
+    <!-- Upload zone — first -->
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('script-upload').click()">
+      <input type="file" id="script-upload" accept=".pdf" onchange="handleFile(this)"/>
+      <div id="upload-icon" style="font-size:32px;margin-bottom:10px;">📄</div>
+      <div id="upload-title" style="font-size:15px;font-weight:700;color:var(--cream);margin-bottom:4px;">Upload your script</div>
+      <div id="upload-sub" style="font-size:11px;color:var(--muted);">Click to browse · PDF only</div>
+    </div>
+
+    <div class="or-divider">or try a demo brief</div>
+
+    <!-- Demo briefs -->
     <div class="panel" style="margin-bottom:16px;">
       <div style="font-size:11px;color:var(--cream2);margin-bottom:12px;font-weight:600;">No script yet? Start with a demo:</div>
       <div class="demo-btns">
         <button class="btn-ghost" onclick="loadDemo('tvc')">🎬 Nike TVC — 3 days</button>
         <button class="btn-ghost" onclick="loadDemo('music')">🎵 Music Video — 2 days</button>
         <button class="btn-ghost" onclick="loadDemo('ott')">📺 OTT Drama — 30 days</button>
-        <button class="btn-ghost" onclick="loadDemo('film')">🎥 Bollywood Film — 60 days</button>
+        <button class="btn-ghost" onclick="loadDemo('film')">🎥 Feature Film — 60 days</button>
       </div>
-    </div>
-
-    <div class="or-divider">or add your own script</div>
-
-    <!-- Upload zone -->
-    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('script-upload').click()">
-      <input type="file" id="script-upload" accept=".pdf,.txt,.fdx,.fountain" onchange="handleFile(this)"/>
-      <div id="upload-icon" style="font-size:32px;margin-bottom:10px;">📄</div>
-      <div id="upload-title" style="font-size:15px;font-weight:700;color:var(--cream);margin-bottom:4px;">Upload your script</div>
-      <div id="upload-sub" style="font-size:11px;color:var(--muted);">Click to browse · PDF · FDX · FOUNTAIN · TXT</div>
     </div>
 
     <div class="or-divider">or paste a brief below</div>
 
     <div class="panel">
-      <textarea id="script-text" placeholder="Describe your shoot in plain English — type, locations, crew size, shoot days. Even one sentence works.&#10;&#10;e.g. 'Nike TVC. 3 days in Mumbai. 2 athletes, 1 coach, 20 extras. No stunts. Handheld camera.'"></textarea>
+      <textarea id="script-text" placeholder="Describe your shoot in plain English — type, locations, crew size, shoot days. Even one sentence works.&#10;&#10;e.g. 'Nike TVC. 3 shoot days. 2 athletes, 1 coach, 20 extras. No stunts. Handheld camera.'"></textarea>
       <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
         <button class="btn-red" onclick="startFlow()">Build My Budget →</button>
         <span style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;">Mark asks a few questions first</span>
@@ -262,11 +262,11 @@ input[type=file]{display:none;}
     <div class="generating">
       <div class="gen-av">M</div>
       <div class="gen-title">Mark is building your budget</div>
-      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Applying Mumbai rate card · Budget codes 10000–14000</div>
+      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Applying market rate card · Budget codes 10000–14000</div>
       <div class="gen-steps">
         <div class="gs active" id="gs1"><div class="gs-dot"></div>Analysing script elements</div>
         <div class="gs" id="gs2"><div class="gs-dot"></div>Mapping to budget codes (10000–14000)</div>
-        <div class="gs" id="gs3"><div class="gs-dot"></div>Applying Mumbai market rates</div>
+        <div class="gs" id="gs3"><div class="gs-dot"></div>Applying market rates</div>
         <div class="gs" id="gs4"><div class="gs-dot"></div>Calculating GST per category</div>
         <div class="gs" id="gs5"><div class="gs-dot"></div>Adding contingency & insurance</div>
         <div class="gs" id="gs6"><div class="gs-dot"></div>Flagging amber & red items</div>
@@ -370,14 +370,14 @@ async function generateQuestions(apiKey, script) {
   const container = document.getElementById('questions-container');
   container.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:20px;text-align:center;">Mark is reading your script...</div>';
 
-  const systemPrompt = `You are Mark, an expert Mumbai film production budgeting AI. You have read a script/brief and need to ask the producer 6 smart questions before generating a budget. Return ONLY valid JSON, no markdown, no explanation:
+  const systemPrompt = `You are Mark, an expert global film production budgeting AI. You have read a script/brief and need to ask the producer 6 smart questions before generating a budget. Return ONLY valid JSON, no markdown, no explanation:
 {
   "intro": "Short warm intro referencing the script (1-2 sentences, mention what type of production you detected)",
   "questions": [
     {"id": "q1", "question": "Question text", "options": ["Option 1", "Option 2", "Option 3", "Option 4"]}
   ]
 }
-Always ask about: 1) Mumbai vs outstation location, 2) budget scale tier (low/mid/high), 3) DOP attached or open market, 4) locations locked or estimating, 5) exact shoot days, 6) anything specific flagged by the script (stunts, VFX, choreography, etc). Keep questions conversational not form-like.`;
+Always ask about: 1) primary shoot market/country (India, UK, US, Europe), 2) budget scale tier (low/mid/high), 3) DOP attached or open market, 4) locations locked or estimating, 5) exact shoot days, 6) anything specific flagged by the script (stunts, VFX, choreography, etc). Keep questions conversational not form-like.`;
 
   try {
     const response = await callClaude(apiKey, systemPrompt, `Read this script and generate pre-budget questions:\n\n${script.substring(0, 6000)}`);
@@ -436,7 +436,7 @@ function runAnimation() {
 }
 
 async function generateBudget(apiKey) {
-  const systemPrompt = `You are Mark, an expert Mumbai film production budgeting AI. Generate a complete itemised budget using the standard Indian production budget code system (10000-14000) used by Mumbai Line Producers.
+  const systemPrompt = `You are Mark, an expert global film production budgeting AI. Generate a complete itemised budget using the standard production budget code system (10000-14000) used by professional line producers.
 
 Return ONLY valid JSON, no markdown fences:
 {
@@ -470,17 +470,17 @@ Return ONLY valid JSON, no markdown fences:
 }
 
 RULES:
-- Use mid-tier Mumbai rates unless scale_tier specified otherwise
+- Use rates appropriate for the production's market (India, UK, US/Hollywood, Europe) based on the script and producer answers
 - Include sections: 10000 (Development), 10300 (Director), 10600 (Director Team), 10700 (Extras), 10800 (Production Staff), 11000 (Art Dept), 11100 (Grip/Ops), 11200 (Stunts if needed), 11300 (Camera), 11400 (Sound), 11500 (Lighting), 11800 (Wardrobe), 11900 (Choreography if needed), 12000 (MUA/Hair), 12100 (Props/Picture Vehicles), 12300 (Transport), 12400 (Location Hire), 12500 (Production Expenses), 12600 (Catering), 12700 (Office), 12800 (Travel if outstation), 12900 (Editorial), 13000 (Sound Editorial), 13100 (Post Sound), 13200 (Music), 13300 (VFX if needed), 13500 (Other Post), 13700 (Insurance=1% BTL), 14000 (Contingency=10% total)
-- GST: 18% crew/equipment, 5% catering, 12% transport, 0% extras/contingency
+- For India: apply GST (18% crew/equipment, 5% catering, 12% transport). For other markets set gst_rate to 0.
 - conf: green=confident, amber=estimate verify, red=highly variable needs producer input
-- All amounts in INR numbers only (no formatting)`;
+- All amounts as numbers only (no formatting), use appropriate currency scale for the market`;
 
   const userMsg = `Script: ${scriptText.substring(0, 4000)}
 
 Producer answers: ${JSON.stringify(answers)}
 
-Generate the complete itemised Mumbai production budget.`;
+Generate the complete itemised production budget.`;
 
   try {
     const response = await callClaude(apiKey, systemPrompt, userMsg, 8000);
@@ -553,7 +553,7 @@ function renderBudget(data) {
   };
 
   document.getElementById('b-title').textContent = data.title || 'AI Budget';
-  document.getElementById('b-meta').textContent = (data.production_type || '') + ' · ' + (data.shoot_days || '?') + ' Shoot Days · Mumbai · AI Draft v1.0 · ' + new Date().toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+  document.getElementById('b-meta').textContent = (data.production_type || '') + ' · ' + (data.shoot_days || '?') + ' Shoot Days · AI Draft v1.0 · ' + new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'});
 
   let totalATL = 0, totalBTL = 0, totalPost = 0;
   const flagsList = [];
