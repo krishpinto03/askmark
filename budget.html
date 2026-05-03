@@ -37,9 +37,20 @@ body{background:var(--bg);color:var(--cream);font-family:'Syne',sans-serif;min-h
 .si-item.active .si-label{color:var(--cream);}
 .si-item.done .si-label{color:var(--cream2);}
 .si-item.inactive .si-label{color:var(--muted);}
-.si-line{flex:1;height:1px;background:var(--border);margin:0 12px;min-width:24px;}
+.si-line{flex:1;height:1px;background:var(--border);margin:0 12px;min-width:16px;}
 
-/* STEP 1 */
+/* REGION CARDS */
+.region-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px;}
+.region-card{background:var(--s1);border:2px solid var(--border);padding:24px 20px;text-align:center;cursor:pointer;transition:all 0.2s;}
+.region-card:hover{border-color:rgba(200,51,10,0.5);background:rgba(200,51,10,0.04);}
+.region-card.sel{border-color:var(--red);background:var(--red-dim);}
+.region-icon{font-size:32px;margin-bottom:10px;}
+.region-name{font-size:14px;font-weight:700;color:var(--cream);margin-bottom:5px;}
+.region-sub{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;line-height:1.5;}
+.region-badge{display:inline-block;margin-top:8px;font-size:9px;font-family:'DM Mono',monospace;padding:3px 8px;background:var(--s3);color:var(--cream2);letter-spacing:0.06em;}
+.region-card.sel .region-badge{background:rgba(200,51,10,0.3);color:#F2A088;}
+
+/* PANELS */
 .panel{background:var(--s1);border:1px solid var(--border);padding:20px;margin-bottom:16px;}
 .panel-title{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:12px;}
 textarea{width:100%;background:var(--s2);border:1px solid var(--border);color:var(--cream2);font-family:'DM Mono',monospace;font-size:12px;padding:12px;resize:vertical;min-height:140px;outline:none;line-height:1.7;}
@@ -62,12 +73,17 @@ input[type=file]{display:none;}
 .intro-text{font-size:13px;color:var(--cream2);line-height:1.6;}
 .q-block{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border);}
 .q-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
-.q-label{font-size:13px;font-weight:600;color:var(--cream);margin-bottom:10px;display:flex;align-items:flex-start;gap:10px;}
+.q-label{font-size:13px;font-weight:600;color:var(--cream);margin-bottom:10px;display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;}
 .q-num{width:22px;height:22px;background:var(--red);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0;border-radius:50%;margin-top:1px;}
+.q-multi-hint{font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;padding:2px 6px;background:var(--s3);letter-spacing:0.05em;margin-top:2px;}
 .q-opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
 .q-opt{padding:7px 14px;border:1px solid var(--border2);color:var(--cream2);font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;transition:all 0.15s;background:var(--s2);letter-spacing:0.04em;user-select:none;}
 .q-opt:hover{border-color:rgba(200,51,10,0.5);color:var(--cream);}
 .q-opt.sel{border-color:var(--red);background:var(--red-dim);color:var(--cream);}
+.q-opt.q-other-opt{border-style:dashed;}
+.q-other-input{margin-top:10px;display:none;}
+.q-other-input input{width:100%;background:var(--s2);border:1px solid rgba(200,51,10,0.4);color:var(--cream);font-family:'DM Mono',monospace;font-size:12px;padding:10px 12px;outline:none;letter-spacing:0.03em;}
+.q-other-input input::placeholder{color:var(--muted);}
 
 /* STEP 3 - GENERATING */
 .generating{text-align:center;padding:80px 24px;}
@@ -150,7 +166,11 @@ input[type=file]{display:none;}
   .back-btn{margin-bottom:16px;}
   .step-indicator{gap:0;overflow-x:auto;}
   .si-label{display:none;}
-  .si-line{min-width:16px;}
+  .si-line{min-width:12px;}
+  .region-grid{grid-template-columns:1fr 1fr;gap:10px;}
+  .region-card{padding:18px 12px;}
+  .region-icon{font-size:24px;}
+  .region-name{font-size:12px;}
   .upload-zone{padding:32px 16px;}
   .demo-btns{flex-direction:column;}
   .demo-btns .btn-ghost{width:100%;text-align:left;}
@@ -181,16 +201,74 @@ input[type=file]{display:none;}
     <div style="font-size:14px;color:var(--cream2);max-width:480px;margin:0 auto;line-height:1.6;">Give Mark your script or a rough brief — he'll ask a few smart questions and generate a full itemised production budget in under a minute.</div>
   </div>
 
-  <!-- STEP 1: INPUT -->
-  <div class="step active" id="step1">
-
-    <!-- Step indicator -->
+  <!-- STEP 0: MARKET SELECTOR -->
+  <div class="step active" id="step0">
     <div class="step-indicator">
-      <div class="si-item active"><div class="si-num">1</div><div class="si-label">Add your script</div></div>
+      <div class="si-item active"><div class="si-num">1</div><div class="si-label">Your market</div></div>
       <div class="si-line"></div>
-      <div class="si-item inactive"><div class="si-num">2</div><div class="si-label">Answer questions</div></div>
+      <div class="si-item inactive"><div class="si-num">2</div><div class="si-label">Add script</div></div>
       <div class="si-line"></div>
-      <div class="si-item inactive"><div class="si-num">3</div><div class="si-label">Get your budget</div></div>
+      <div class="si-item inactive"><div class="si-num">3</div><div class="si-label">Questions</div></div>
+      <div class="si-line"></div>
+      <div class="si-item inactive"><div class="si-num">4</div><div class="si-label">Budget</div></div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div style="font-size:16px;font-weight:700;color:var(--cream);margin-bottom:6px;">Where is your production based?</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">This sets the currency and market rates for your budget.</div>
+    </div>
+
+    <div class="region-grid">
+      <div class="region-card" id="rc-india" onclick="selectRegion('india','₹','INR','Indian Rupee')">
+        <div class="region-icon">🎬</div>
+        <div class="region-name">Indian Cinema</div>
+        <div class="region-sub">Bollywood · OTT · TVC<br/>Budget codes 10000–14000 · GST</div>
+        <div class="region-badge">₹ INR</div>
+      </div>
+      <div class="region-card" id="rc-hollywood" onclick="selectRegion('hollywood','$','USD','US Dollar')">
+        <div class="region-icon">🎥</div>
+        <div class="region-name">Hollywood / North America</div>
+        <div class="region-sub">Feature Film · TV · Streaming<br/>Union & non-union rates</div>
+        <div class="region-badge">$ USD</div>
+      </div>
+      <div class="region-card" id="rc-uk" onclick="selectRegion('uk','£','GBP','British Pound')">
+        <div class="region-icon">🎭</div>
+        <div class="region-name">UK & Europe</div>
+        <div class="region-sub">Film · TV · Commercials<br/>PACT / Indie rates</div>
+        <div class="region-badge">£ GBP</div>
+      </div>
+      <div class="region-card" id="rc-other" onclick="selectRegion('other','$','USD','US Dollar')">
+        <div class="region-icon">🌍</div>
+        <div class="region-name">Other / International</div>
+        <div class="region-sub">Global co-productions<br/>Enter your own rates</div>
+        <div class="region-badge">$ USD</div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;display:flex;justify-content:flex-end;">
+      <button class="btn-red" id="market-next-btn" onclick="goTo('step1')" style="opacity:0.4;pointer-events:none;">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 1: INPUT -->
+  <div class="step" id="step1">
+    <div class="step-indicator">
+      <div class="si-item done"><div class="si-num">1</div><div class="si-label">Your market</div></div>
+      <div class="si-line"></div>
+      <div class="si-item active"><div class="si-num">2</div><div class="si-label">Add your script</div></div>
+      <div class="si-line"></div>
+      <div class="si-item inactive"><div class="si-num">3</div><div class="si-label">Answer questions</div></div>
+      <div class="si-line"></div>
+      <div class="si-item inactive"><div class="si-num">4</div><div class="si-label">Get your budget</div></div>
+    </div>
+
+    <div style="background:var(--s1);border:1px solid var(--border);padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
+      <div id="market-display-icon" style="font-size:22px;"></div>
+      <div style="flex:1;">
+        <div style="font-size:12px;font-weight:700;color:var(--cream);" id="market-display-name">Market selected</div>
+        <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;" id="market-display-currency">Currency set</div>
+      </div>
+      <button onclick="goTo('step0')" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:9px;padding:5px 10px;cursor:pointer;letter-spacing:0.05em;">Change</button>
     </div>
 
     <!-- Upload zone — first -->
@@ -231,11 +309,13 @@ input[type=file]{display:none;}
   <!-- STEP 2: QUESTIONS -->
   <div class="step" id="step2">
     <div class="step-indicator" style="margin-bottom:32px;">
-      <div class="si-item done"><div class="si-num">1</div><div class="si-label">Script added</div></div>
+      <div class="si-item done"><div class="si-num">1</div><div class="si-label">Market</div></div>
       <div class="si-line"></div>
-      <div class="si-item active"><div class="si-num">2</div><div class="si-label">Answer questions</div></div>
+      <div class="si-item done"><div class="si-num">2</div><div class="si-label">Script added</div></div>
       <div class="si-line"></div>
-      <div class="si-item inactive"><div class="si-num">3</div><div class="si-label">Get your budget</div></div>
+      <div class="si-item active"><div class="si-num">3</div><div class="si-label">Answer questions</div></div>
+      <div class="si-line"></div>
+      <div class="si-item inactive"><div class="si-num">4</div><div class="si-label">Get budget</div></div>
     </div>
     <div class="mark-intro">
       <div class="mark-av">M</div>
@@ -253,21 +333,23 @@ input[type=file]{display:none;}
   <!-- STEP 3: GENERATING -->
   <div class="step" id="step3">
     <div class="step-indicator" style="margin-bottom:32px;">
-      <div class="si-item done"><div class="si-num">1</div><div class="si-label">Script added</div></div>
+      <div class="si-item done"><div class="si-num">1</div><div class="si-label">Market</div></div>
       <div class="si-line"></div>
-      <div class="si-item done"><div class="si-num">2</div><div class="si-label">Questions answered</div></div>
+      <div class="si-item done"><div class="si-num">2</div><div class="si-label">Script added</div></div>
       <div class="si-line"></div>
-      <div class="si-item active"><div class="si-num">3</div><div class="si-label">Building budget</div></div>
+      <div class="si-item done"><div class="si-num">3</div><div class="si-label">Questions answered</div></div>
+      <div class="si-line"></div>
+      <div class="si-item active"><div class="si-num">4</div><div class="si-label">Building budget</div></div>
     </div>
     <div class="generating">
       <div class="gen-av">M</div>
       <div class="gen-title">Mark is building your budget</div>
-      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;">Applying market rate card · Budget codes 10000–14000</div>
+      <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;" id="gen-subtitle">Applying market rate card · Budget codes 10000–14000</div>
       <div class="gen-steps">
         <div class="gs active" id="gs1"><div class="gs-dot"></div>Analysing script elements</div>
         <div class="gs" id="gs2"><div class="gs-dot"></div>Mapping to budget codes (10000–14000)</div>
         <div class="gs" id="gs3"><div class="gs-dot"></div>Applying market rates</div>
-        <div class="gs" id="gs4"><div class="gs-dot"></div>Calculating GST per category</div>
+        <div class="gs" id="gs4"><div class="gs-dot"></div>Calculating taxes per category</div>
         <div class="gs" id="gs5"><div class="gs-dot"></div>Adding contingency & insurance</div>
         <div class="gs" id="gs6"><div class="gs-dot"></div>Flagging amber & red items</div>
       </div>
@@ -285,12 +367,12 @@ input[type=file]{display:none;}
         <button class="btn-sm btn-export" onclick="exportExcel()">Export Excel</button>
         <button class="btn-sm btn-export" onclick="window.print()">Export PDF</button>
         <button class="btn-sm btn-lock" onclick="lockBudget()">Lock Budget</button>
-        <button class="btn-sm btn-ghost" onclick="goTo('step1')" style="font-size:10px;">New Budget</button>
+        <button class="btn-sm btn-ghost" onclick="startOver()" style="font-size:10px;">New Budget</button>
       </div>
     </div>
 
     <div class="summary-grid">
-      <div class="sum-card"><div class="sum-label">Grand Total</div><div class="sum-val" id="s-grand">—</div><div class="sum-sub">incl. GST & contingency</div></div>
+      <div class="sum-card"><div class="sum-label">Grand Total</div><div class="sum-val" id="s-grand">—</div><div class="sum-sub">incl. tax & contingency</div></div>
       <div class="sum-card"><div class="sum-label">Below the Line</div><div class="sum-val" id="s-btl">—</div><div class="sum-sub">production costs</div></div>
       <div class="sum-card"><div class="sum-label">Post Production</div><div class="sum-val" id="s-post">—</div><div class="sum-sub">edit, grade, sound</div></div>
       <div class="sum-card"><div class="sum-label">Per Day Average</div><div class="sum-val" id="s-day">—</div><div class="sum-sub">shoot days only</div></div>
@@ -311,16 +393,36 @@ input[type=file]{display:none;}
 </div>
 
 <script>
+// ── REGION / CURRENCY STATE ───────────────────────────────────────────────────
+let region = 'india';
+let currency = { symbol: '₹', code: 'INR', name: 'Indian Rupee' };
+const regionMeta = {
+  india:     { icon: '🎬', label: 'Indian Cinema', currencyLabel: '₹ INR — Indian Rupee' },
+  hollywood: { icon: '🎥', label: 'Hollywood / North America', currencyLabel: '$ USD — US Dollar' },
+  uk:        { icon: '🎭', label: 'UK & Europe', currencyLabel: '£ GBP — British Pound' },
+  other:     { icon: '🌍', label: 'Other / International', currencyLabel: '$ USD — US Dollar' },
+};
+
+function selectRegion(r, sym, code, name) {
+  region = r;
+  currency = { symbol: sym, code, name };
+  document.querySelectorAll('.region-card').forEach(c => c.classList.remove('sel'));
+  document.getElementById('rc-' + r).classList.add('sel');
+  const btn = document.getElementById('market-next-btn');
+  btn.style.opacity = '1';
+  btn.style.pointerEvents = 'auto';
+}
+
 // ── RESTORE SAVED API KEY ─────────────────────────────────────────────────────
 const savedKey = localStorage.getItem('mark_api_key');
 if(savedKey) document.getElementById('api-key').value = savedKey;
 
 // ── DEMO BRIEFS ────────────────────────────────────────────────────────────────
 const demos = {
-  tvc: "Nike 60-second TVC. Production type: brand film / commercial. 3 shoot days in Mumbai. Locations: Bandra sea-face (exterior, golden hour), Dharavi lanes (exterior, high energy), and a basketball court in Andheri (interior/exterior). Principal cast: 2 professional athletes and 1 senior coach character. Supporting cast: approximately 20 young players. No stunts. Handheld camera, fast edit. Bilingual Hindi-English. Estimated crew: 35 people. No celebrity talent attached yet.",
-  music: "Hindi pop music video for a major label. 2 shoot days. Mumbai — Juhu beach (exterior day) and one nightclub set build in a studio. Lead artist plus 10 backup dancers. Full choreography required. 2 costume changes per dancer, 3 for lead. Special LED lighting rig. Estimated crew: 25. No stunts. Post: colour grade and light visual effects only.",
-  ott: "OTT drama series for a major streaming platform. Budget for one episode. 30 shoot days over 3 months. Mumbai suburban practical locations, one police station set build, outdoor chase sequences (moderate stunt work), one 5-day outstation in Rajasthan. Principal cast: 4 leads. Supporting cast: 25+. Post production: 4 months. Moderate VFX (city cleanup, a few digital extensions). Target delivery: 4K HDR.",
-  film: "Hindi action feature film. 60 shoot days. Mumbai + 5 days Jodhpur (outstation). Principal cast: 4 lead actors. Supporting cast: 40+. 3 song sequences requiring full choreography and dancers. Car chases and action sequences — moderate to complex stunt work. Stunt director required. VFX: city backdrop extensions, some digital destruction sequences. Post production: 6 months. Music director to be attached."
+  tvc: "Nike 60-second TVC. Production type: brand film / commercial. 3 shoot days. Locations: seaside promenade (exterior, golden hour), urban street lanes (exterior, high energy), and a sports court (interior/exterior). Principal cast: 2 professional athletes and 1 senior coach character. Supporting cast: approximately 20 young players. No stunts. Handheld camera, fast edit. Estimated crew: 35 people. No celebrity talent attached yet.",
+  music: "Hindi pop music video for a major label. 2 shoot days. Locations: beach exterior (day) and nightclub set build in a studio. Lead artist plus 10 backup dancers. Full choreography required. 2 costume changes per dancer, 3 for lead. Special LED lighting rig. Estimated crew: 25. No stunts. Post: colour grade and light visual effects only.",
+  ott: "OTT drama series for a major streaming platform. Budget for one episode. 30 shoot days over 3 months. Suburban practical locations, one police station set build, outdoor chase sequences (moderate stunt work), one 5-day outstation trip. Principal cast: 4 leads. Supporting cast: 25+. Post production: 4 months. Moderate VFX (city cleanup, a few digital extensions). Target delivery: 4K HDR.",
+  film: "Action feature film. 60 shoot days. Primary city locations plus 5 days outstation. Principal cast: 4 lead actors. Supporting cast: 40+. 3 song sequences requiring full choreography and dancers. Car chases and action sequences — moderate to complex stunt work. Stunt director required. VFX: backdrop extensions, some digital destruction sequences. Post production: 6 months."
 };
 
 function loadDemo(type) {
@@ -330,13 +432,7 @@ function loadDemo(type) {
 function handleFile(input) {
   if(input.files && input.files[0]) {
     const file = input.files[0];
-    if(file.name.endsWith('.txt') || file.name.endsWith('.fountain') || file.name.endsWith('.fdx')) {
-      const reader = new FileReader();
-      reader.onload = e => { document.getElementById('script-text').value = e.target.result.substring(0, 8000); };
-      reader.readAsText(file);
-    } else {
-      document.getElementById('script-text').value = '[File uploaded: ' + file.name + ' — Mark will analyse this script]';
-    }
+    document.getElementById('script-text').value = '[PDF uploaded: ' + file.name + ' — Mark will analyse this script]';
     const zone = document.getElementById('upload-zone');
     zone.style.borderColor = '#2E7D32';
     zone.style.background = 'rgba(46,125,50,0.1)';
@@ -354,33 +450,63 @@ let answers = {};
 let budgetData = null;
 
 // ── FLOW ──────────────────────────────────────────────────────────────────────
-async function startFlow() {
-  const apiKey = document.getElementById('api-key').value.trim();
-  scriptText = document.getElementById('script-text').value.trim();
+function goTo(id) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
 
-  // API key only needed if not using the backend proxy
-  if(scriptText.length < 30) { showError('Please paste your script or brief — the more detail the better.'); return; }
-
-  hideError();
-  goTo('step2');
-  await generateQuestions(apiKey, scriptText);
+  // Update market display bar when entering step1
+  if(id === 'step1' && region) {
+    const m = regionMeta[region];
+    document.getElementById('market-display-icon').textContent = m.icon;
+    document.getElementById('market-display-name').textContent = m.label;
+    document.getElementById('market-display-currency').textContent = m.currencyLabel;
+    document.getElementById('gen-subtitle').textContent =
+      'Applying ' + m.label + ' market rates · Budget codes 10000–14000';
+  }
 }
 
-async function generateQuestions(apiKey, script) {
+function startOver() {
+  answers = {};
+  budgetData = null;
+  scriptText = '';
+  document.getElementById('script-text').value = '';
+  // Reset upload zone
+  const zone = document.getElementById('upload-zone');
+  zone.style.borderColor = '';
+  zone.style.background = '';
+  document.getElementById('upload-icon').textContent = '📄';
+  document.getElementById('upload-icon').style.color = '';
+  document.getElementById('upload-title').textContent = 'Upload your script';
+  document.getElementById('upload-title').style.color = '';
+  document.getElementById('upload-sub').textContent = 'Click to browse · PDF only';
+  goTo('step0');
+}
+
+async function startFlow() {
+  scriptText = document.getElementById('script-text').value.trim();
+  if(scriptText.length < 30) { showError('Please paste your script or brief — the more detail the better.'); return; }
+  hideError();
+  goTo('step2');
+  await generateQuestions(scriptText);
+}
+
+async function generateQuestions(script) {
   const container = document.getElementById('questions-container');
   container.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:20px;text-align:center;">Mark is reading your script...</div>';
 
-  const systemPrompt = `You are Mark, an expert global film production budgeting AI. You have read a script/brief and need to ask the producer 6 smart questions before generating a budget. Return ONLY valid JSON, no markdown, no explanation:
+  const m = regionMeta[region];
+  const systemPrompt = `You are Mark, an expert ${m.label} film production budgeting AI. You have read a script/brief and need to ask the producer 6 smart questions before generating a budget. Return ONLY valid JSON, no markdown, no explanation:
 {
   "intro": "Short warm intro referencing the script (1-2 sentences, mention what type of production you detected)",
   "questions": [
     {"id": "q1", "question": "Question text", "options": ["Option 1", "Option 2", "Option 3", "Option 4"]}
   ]
 }
-Always ask about: 1) primary shoot market/country (India, UK, US, Europe), 2) budget scale tier (low/mid/high), 3) DOP attached or open market, 4) locations locked or estimating, 5) exact shoot days, 6) anything specific flagged by the script (stunts, VFX, choreography, etc). Keep questions conversational not form-like.`;
+Always ask about: 1) specific shoot locations or cities within the ${m.label} market, 2) budget scale tier (low/mid/high), 3) DOP attached or open market, 4) locations locked or estimating, 5) exact shoot days, 6) anything specific flagged by the script (stunts, VFX, choreography, etc). For location questions provide at least 4-6 specific options relevant to the ${m.label} market. Keep questions conversational not form-like.`;
 
   try {
-    const response = await callClaude(apiKey, systemPrompt, `Read this script and generate pre-budget questions:\n\n${script.substring(0, 6000)}`);
+    const response = await callMark(systemPrompt, `Read this script and generate pre-budget questions:\n\n${script.substring(0, 6000)}`);
     const data = parseJSON(response);
     document.getElementById('intro-text').innerHTML = data.intro;
     renderQuestions(data.questions, container);
@@ -390,23 +516,105 @@ Always ask about: 1) primary shoot market/country (India, UK, US, Europe), 2) bu
   }
 }
 
+// ── QUESTION RENDERING ────────────────────────────────────────────────────────
 function renderQuestions(questions, container) {
   container.innerHTML = '';
   questions.forEach((q, i) => {
+    const isMulti = /location|city|cities|market|country|countries|where|region|markets|shoot/i.test(q.question);
     const block = document.createElement('div');
     block.className = 'q-block';
+    const opts = [...(q.options || []), 'Other'];
     block.innerHTML = `
-      <div class="q-label"><div class="q-num">${i+1}</div>${q.question}</div>
-      <div class="q-opts">${(q.options || []).map(o => `<div class="q-opt" onclick="selectOpt(this,'${q.id}')" data-qid="${q.id}">${o}</div>`).join('')}</div>
+      <div class="q-label">
+        <div class="q-num">${i+1}</div>
+        <span>${q.question}</span>
+        ${isMulti ? '<span class="q-multi-hint">select all that apply</span>' : ''}
+      </div>
+      <div class="q-opts" data-qid="${q.id}" data-multi="${isMulti}">
+        ${opts.map(o => `<div class="q-opt${o==='Other'?' q-other-opt':''}" onclick="selectOpt(this,'${q.id}')" data-val="${o.replace(/'/g,"\\'")}">
+          ${o}
+        </div>`).join('')}
+      </div>
+      <div class="q-other-input" id="other-${q.id}">
+        <input type="text" placeholder="${isMulti ? 'Add other locations or details...' : 'Please specify your answer...'}"
+          oninput="setOtherAnswer('${q.id}',this.value)"/>
+      </div>
     `;
     container.appendChild(block);
   });
 }
 
 function selectOpt(el, qid) {
-  el.closest('.q-opts').querySelectorAll('.q-opt').forEach(o => o.classList.remove('sel'));
-  el.classList.add('sel');
-  answers[qid] = el.textContent;
+  const opts = el.closest('.q-opts');
+  const isMulti = opts.dataset.multi === 'true';
+  const isOther = el.dataset.val === 'Other';
+  const otherDiv = document.getElementById('other-' + qid);
+
+  if (isMulti) {
+    el.classList.toggle('sel');
+    const otherOpt = opts.querySelector('.q-other-opt');
+    if (otherOpt && otherOpt.classList.contains('sel')) {
+      otherDiv.style.display = 'block';
+    } else {
+      otherDiv.style.display = 'none';
+    }
+    updateMultiAnswer(qid, opts, otherDiv);
+  } else {
+    opts.querySelectorAll('.q-opt').forEach(o => o.classList.remove('sel'));
+    el.classList.add('sel');
+    if (isOther) {
+      otherDiv.style.display = 'block';
+      answers[qid] = otherDiv.querySelector('input').value || '';
+    } else {
+      otherDiv.style.display = 'none';
+      answers[qid] = el.dataset.val;
+    }
+  }
+}
+
+function setOtherAnswer(qid, val) {
+  const opts = document.querySelector(`[data-qid="${qid}"]`);
+  const otherDiv = document.getElementById('other-' + qid);
+  if (opts.dataset.multi === 'true') {
+    updateMultiAnswer(qid, opts, otherDiv);
+  } else {
+    answers[qid] = val;
+  }
+}
+
+function updateMultiAnswer(qid, opts, otherDiv) {
+  const otherInput = otherDiv ? otherDiv.querySelector('input') : null;
+  const selected = [...opts.querySelectorAll('.q-opt.sel')].map(o => {
+    if (o.classList.contains('q-other-opt')) {
+      return otherInput && otherInput.value ? otherInput.value : null;
+    }
+    return o.dataset.val;
+  }).filter(Boolean);
+  answers[qid] = selected.join(', ');
+}
+
+function selectOpt(el, qid) {
+  const opts = el.closest('.q-opts');
+  const isMulti = opts.dataset.multi === 'true';
+  const isOther = el.classList.contains('q-other-opt');
+  const otherDiv = document.getElementById('other-' + qid);
+
+  if (isMulti) {
+    el.classList.toggle('sel');
+    const otherSelected = opts.querySelector('.q-other-opt') && opts.querySelector('.q-other-opt').classList.contains('sel');
+    otherDiv.style.display = otherSelected ? 'block' : 'none';
+    updateMultiAnswer(qid, opts, otherDiv);
+  } else {
+    opts.querySelectorAll('.q-opt').forEach(o => o.classList.remove('sel'));
+    el.classList.add('sel');
+    if (isOther) {
+      otherDiv.style.display = 'block';
+      answers[qid] = otherDiv.querySelector('input').value || '';
+    } else {
+      otherDiv.style.display = 'none';
+      answers[qid] = el.dataset.val;
+    }
+  }
 }
 
 async function submitAnswers() {
@@ -421,10 +629,11 @@ function runAnimation() {
   let i = 0;
   const iv = setInterval(() => {
     if(i > 0) {
-      document.getElementById(steps[i-1]).classList.remove('active');
-      document.getElementById(steps[i-1]).classList.add('done');
-      document.getElementById(steps[i-1]).querySelector('.gs-dot').style.background = '#2E7D32';
-      document.getElementById(steps[i-1]).querySelector('.gs-dot').style.animation = 'none';
+      const prev = document.getElementById(steps[i-1]);
+      prev.classList.remove('active');
+      prev.classList.add('done');
+      prev.querySelector('.gs-dot').style.background = '#2E7D32';
+      prev.querySelector('.gs-dot').style.animation = 'none';
     }
     if(i < steps.length) {
       document.getElementById(steps[i]).classList.add('active');
@@ -436,9 +645,18 @@ function runAnimation() {
 }
 
 async function generateBudget(apiKey) {
-  const systemPrompt = `You are Mark, an expert global film production budgeting AI. Generate a complete itemised budget using the standard production budget code system (10000-14000) used by professional line producers.
+  const m = regionMeta[region];
+  const taxNote = region === 'india'
+    ? 'Apply GST: 18% on crew/equipment, 5% on catering, 12% on transport, 0% on contingency/extras.'
+    : region === 'uk'
+    ? 'Apply VAT at 20% where applicable. Most film crew services are VAT exempt — use gst_rate:0 for those.'
+    : 'No VAT/GST — set gst_rate to 0 for all items. Use USD rates typical for the market.';
 
-Return ONLY valid JSON, no markdown fences:
+  const systemPrompt = `You are Mark, an expert ${m.label} film production budgeting AI. Generate a complete itemised budget.
+
+Market: ${m.label} | Currency: ${currency.symbol} ${currency.code}
+
+Return ONLY valid JSON, no markdown fences, no extra text:
 {
   "title": "Project title",
   "production_type": "TVC/Music Video/OTT/Feature Film",
@@ -450,110 +668,110 @@ Return ONLY valid JSON, no markdown fences:
   "sections": [
     {
       "code": "10000",
-      "name": "PRODUCTION / DEVELOPMENT",
+      "name": "SECTION NAME",
       "type": "above_the_line",
       "items": [
         {
           "code": "10001",
-          "desc": "Location Scouting",
-          "sub": "Basis description",
-          "amount": 200000,
+          "desc": "Line item name",
+          "sub": "Basis/notes",
+          "amount": 50000,
           "gst_rate": 0.18,
           "conf": "green",
-          "note": "Optional note for amber/red"
+          "note": "Optional note for amber/red items"
         }
       ]
     }
   ],
-  "excluded": ["Principal cast fees", "Producer fees", "Any elements not mentioned"],
-  "flags": ["List of items needing producer verification"]
+  "excluded": ["Principal cast fees", "Producer fees"],
+  "flags": ["Items needing producer verification"]
 }
 
-RULES:
-- Use rates appropriate for the production's market (India, UK, US/Hollywood, Europe) based on the script and producer answers
-- Include sections: 10000 (Development), 10300 (Director), 10600 (Director Team), 10700 (Extras), 10800 (Production Staff), 11000 (Art Dept), 11100 (Grip/Ops), 11200 (Stunts if needed), 11300 (Camera), 11400 (Sound), 11500 (Lighting), 11800 (Wardrobe), 11900 (Choreography if needed), 12000 (MUA/Hair), 12100 (Props/Picture Vehicles), 12300 (Transport), 12400 (Location Hire), 12500 (Production Expenses), 12600 (Catering), 12700 (Office), 12800 (Travel if outstation), 12900 (Editorial), 13000 (Sound Editorial), 13100 (Post Sound), 13200 (Music), 13300 (VFX if needed), 13500 (Other Post), 13700 (Insurance=1% BTL), 14000 (Contingency=10% total)
-- For India: apply GST (18% crew/equipment, 5% catering, 12% transport). For other markets set gst_rate to 0.
-- conf: green=confident, amber=estimate verify, red=highly variable needs producer input
-- All amounts as numbers only (no formatting), use appropriate currency scale for the market`;
+IMPORTANT RULES:
+- Use mid-tier ${m.label} rates unless scale_tier says otherwise
+- Keep budget focused — aim for 8-12 sections, 4-6 items each (stay under 4000 tokens)
+- Include key sections: Development (10000), Director (10300), Director Team (10600), Extras (10700), Production Staff (10800), Art Dept (11000), Camera (11300), Sound (11400), Lighting (11500), Wardrobe (11800), MUA/Hair (12000), Transport (12300), Location Hire (12400), Catering (12600), Editorial (12900), Post Sound (13100), Insurance (13700), Contingency (14000)
+- Only add VFX (13300), Stunts (11200), Choreography (11900), Travel (12800) if mentioned
+- ${taxNote}
+- conf: green=confident, amber=estimate, red=needs producer input
+- All amounts as plain numbers only (no currency symbols, no commas)`;
 
-  const userMsg = `Script: ${scriptText.substring(0, 4000)}
+  const userMsg = `Script: ${scriptText.substring(0, 3000)}
 
 Producer answers: ${JSON.stringify(answers)}
+Market: ${m.label} | Currency: ${currency.symbol} ${currency.code}
 
-Generate the complete itemised production budget.`;
+Generate the complete itemised production budget. Be concise — quality over quantity of line items.`;
 
   try {
-    const response = await callClaude(apiKey, systemPrompt, userMsg, 8000);
+    const response = await callMark(systemPrompt, userMsg, 4000);
     budgetData = parseJSON(response);
     renderBudget(budgetData);
     goTo('step4');
   } catch(e) {
-    showError('Budget generation error: ' + e.message + '. Check your API key and try again.');
+    const msg = e.message.includes('fetch')
+      ? 'The AI took too long to respond. Please try again — it usually works on the second attempt.'
+      : 'Budget generation error: ' + e.message;
+    showError(msg);
     goTo('step1');
   }
 }
 
-// ── CLAUDE API CALL ───────────────────────────────────────────────────────────
-async function callClaude(apiKey, system, user, maxTokens = 3000) {
-  // Use Vercel proxy — API key is stored server-side, no key needed from user
+// ── MARK API CALL ─────────────────────────────────────────────────────────────
+async function callMark(system, user, maxTokens = 3000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 55000);
   try {
-    const proxyResp = await fetch('https://askmark-proxy.vercel.app/api/claude', {
+    const resp = await fetch('https://askmark-proxy.vercel.app/api/claude', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ system, user, max_tokens: maxTokens })
+      body: JSON.stringify({ system, user, max_tokens: maxTokens }),
+      signal: controller.signal
     });
-    if(proxyResp.ok) {
-      const data = await proxyResp.json();
-      return data.content[0].text;
+    clearTimeout(timeout);
+    if(resp.ok) {
+      const data = await resp.json();
+      if(data.content && data.content[0]) return data.content[0].text;
+      throw new Error(data.error?.message || 'Unexpected response from server');
     }
-    const err = await proxyResp.json();
-    throw new Error(err.error?.message || 'Server error');
-  } catch(e) { throw e; }
-
-  // Fallback: direct browser call using entered API key
-  if(!apiKey) throw new Error('No API key — please enter one above');
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: maxTokens,
-      system: system,
-      messages: [{ role: 'user', content: user }]
-    })
-  });
-
-  if(!response.ok) {
-    const err = await response.json();
-    throw new Error(err.error?.message || 'API error ' + response.status);
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error?.message || 'Server error ' + resp.status);
+  } catch(e) {
+    clearTimeout(timeout);
+    if(e.name === 'AbortError') throw new Error('Request timed out — please try again.');
+    throw e;
   }
-
-  const data = await response.json();
-  return data.content[0].text;
 }
 
 function parseJSON(text) {
   let t = text.trim();
   if(t.startsWith('```')) { t = t.replace(/^```json?\n?/, '').replace(/\n?```$/, ''); }
+  // Strip any leading text before the first {
+  const start = t.indexOf('{');
+  if(start > 0) t = t.substring(start);
   return JSON.parse(t);
+}
+
+// ── FORMAT CURRENCY ───────────────────────────────────────────────────────────
+function fmtAmt(n) {
+  n = Math.round(Number(n) || 0);
+  const sym = currency.symbol;
+  if(region === 'india') {
+    if(n >= 10000000) return sym + (n/10000000).toFixed(2) + ' Cr';
+    if(n >= 100000) return sym + (n/100000).toFixed(1) + 'L';
+    return sym + n.toLocaleString('en-IN');
+  }
+  return sym + n.toLocaleString('en-US');
 }
 
 // ── RENDER BUDGET ─────────────────────────────────────────────────────────────
 function renderBudget(data) {
-  const fmtINR = n => {
-    n = Math.round(Number(n) || 0);
-    if(n >= 10000000) return '₹' + (n/10000000).toFixed(2) + ' Cr';
-    if(n >= 100000) return '₹' + (n/100000).toFixed(1) + 'L';
-    return '₹' + n.toLocaleString('en-IN');
-  };
-
+  const m = regionMeta[region];
   document.getElementById('b-title').textContent = data.title || 'AI Budget';
-  document.getElementById('b-meta').textContent = (data.production_type || '') + ' · ' + (data.shoot_days || '?') + ' Shoot Days · AI Draft v1.0 · ' + new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  document.getElementById('b-meta').textContent =
+    (data.production_type || '') + ' · ' + (data.shoot_days || '?') + ' Shoot Days · ' +
+    m.label + ' · ' + currency.symbol + currency.code + ' · AI Draft v1.0 · ' +
+    new Date().toLocaleDateString('en-GB',{month:'long',year:'numeric'});
 
   let totalATL = 0, totalBTL = 0, totalPost = 0;
   const flagsList = [];
@@ -578,10 +796,10 @@ function renderBudget(data) {
   const grandTotal = totalATL + totalBTL + totalPost + insurance + contingency;
   const shootDays = Number(data.shoot_days) || 1;
 
-  document.getElementById('s-grand').textContent = fmtINR(grandTotal);
-  document.getElementById('s-btl').textContent = fmtINR(totalBTL);
-  document.getElementById('s-post').textContent = fmtINR(totalPost);
-  document.getElementById('s-day').textContent = fmtINR(Math.round(grandTotal / shootDays));
+  document.getElementById('s-grand').textContent = fmtAmt(grandTotal);
+  document.getElementById('s-btl').textContent = fmtAmt(totalBTL);
+  document.getElementById('s-post').textContent = fmtAmt(totalPost);
+  document.getElementById('s-day').textContent = fmtAmt(Math.round(grandTotal / shootDays));
 
   if(data.confidence_note) document.getElementById('conf-text').textContent = data.confidence_note;
 
@@ -595,7 +813,11 @@ function renderBudget(data) {
   const container = document.getElementById('budget-sections');
   container.innerHTML = '';
 
-  const typeBadge = t => t === 'above_the_line' ? '<span class="sec-type-badge atl">ATL</span>' : t === 'below_the_line' ? '<span class="sec-type-badge btl">BTL</span>' : '<span class="sec-type-badge post">POST</span>';
+  const typeBadge = t => t === 'above_the_line'
+    ? '<span class="sec-type-badge atl">ATL</span>'
+    : t === 'below_the_line'
+    ? '<span class="sec-type-badge btl">BTL</span>'
+    : '<span class="sec-type-badge post">POST</span>';
 
   data.sections.forEach(s => {
     const id = 'sec-' + s.code;
@@ -606,23 +828,23 @@ function renderBudget(data) {
         <span class="sec-code">${s.code}</span>
         <span class="sec-name">${s.name}</span>
         ${typeBadge(s.type)}
-        <span class="sec-total">${fmtINR(s._total)}</span>
+        <span class="sec-total">${fmtAmt(s._total)}</span>
         <span class="sec-arr" id="arr-${id}">▼</span>
       </div>
       <div class="sec-body" id="${id}">
         <div class="tbl-hdr">
           <div class="th"></div><div class="th">Description</div>
-          <div class="th">Amount</div><div class="th">GST</div>
+          <div class="th">Amount</div><div class="th">Tax</div>
           <div class="th">Total</div><div class="th"></div>
         </div>
         ${s.items.map(li => `
           <div class="li-row">
-            <div class="li-conf"><div class="cdot ${li.conf === 'green' ? 'cg' : li.conf === 'amber' ? 'ca' : 'cr'}" title="${li.note || ''}"></div></div>
-            <div class="li-desc"><div>${li.code} · ${li.desc}</div><div class="li-desc-sub">${li.sub || ''}</div></div>
-            <div class="li-amt">${fmtINR(li.amount)}</div>
-            <div class="li-gst">${li._gst > 0 ? fmtINR(li._gst) : '—'}</div>
-            <div class="li-tot">${fmtINR(li._total)}</div>
-            <div class="li-edit" title="Edit this line">✎</div>
+            <div class="li-conf"><div class="cdot ${li.conf==='green'?'cg':li.conf==='amber'?'ca':'cr'}" title="${li.note||''}"></div></div>
+            <div class="li-desc"><div>${li.code} · ${li.desc}</div><div class="li-desc-sub">${li.sub||''}</div></div>
+            <div class="li-amt">${fmtAmt(li.amount)}</div>
+            <div class="li-gst">${li._gst>0?fmtAmt(li._gst):'—'}</div>
+            <div class="li-tot">${fmtAmt(li._total)}</div>
+            <div class="li-edit" title="Edit">✎</div>
           </div>
         `).join('')}
       </div>
@@ -630,21 +852,19 @@ function renderBudget(data) {
     container.appendChild(wrap);
   });
 
-  // Insurance & Contingency rows
-  [['13700','INSURANCE','1% of below-the-line', insurance],['14000','CONTINGENCY','10% of total', contingency]].forEach(([code, name, sub, amt]) => {
+  [['13700','INSURANCE','1% of below-the-line', insurance],
+   ['14000','CONTINGENCY','10% of total pre-contingency', contingency]].forEach(([code,name,sub,amt]) => {
     const wrap = document.createElement('div');
     wrap.style.marginBottom = '2px';
-    wrap.innerHTML = `<div class="section-hdr"><span class="sec-code">${code}</span><span class="sec-name">${name}</span><span style="font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;flex:1;">${sub}</span><span class="sec-total">${fmtINR(amt)}</span><span class="sec-arr"></span></div>`;
+    wrap.innerHTML = `<div class="section-hdr"><span class="sec-code">${code}</span><span class="sec-name">${name}</span><span style="font-size:9px;color:var(--muted);font-family:'DM Mono',monospace;flex:1;">${sub}</span><span class="sec-total">${fmtAmt(amt)}</span><span class="sec-arr"></span></div>`;
     container.appendChild(wrap);
   });
 
-  // Grand total
   const gt = document.createElement('div');
   gt.className = 'grand-row';
-  gt.innerHTML = `<span class="grand-label">Grand Total (incl. GST & Contingency)</span><span class="grand-val">${fmtINR(grandTotal)}</span>`;
+  gt.innerHTML = `<span class="grand-label">Grand Total (incl. tax & contingency)</span><span class="grand-val">${fmtAmt(grandTotal)}</span>`;
   container.appendChild(gt);
 
-  // Excluded note
   const excl = data.excluded || [];
   document.getElementById('excl-note').innerHTML = `<strong>Excluded from this budget:</strong> ${excl.join(' · ')}`;
 }
@@ -656,23 +876,39 @@ function toggleSec(id) {
 
 // ── EXPORT EXCEL ──────────────────────────────────────────────────────────────
 function exportExcel() {
-  if(!budgetData) return;
-  const fmtINR = n => Math.round(Number(n) || 0);
-  const rows = [['Code','Description','Basis','Amount (₹)','GST (₹)','Total with GST (₹)','Confidence','Notes']];
+  if(!budgetData) { alert('No budget to export yet.'); return; }
+  const sym = currency.symbol;
+  const rows = [
+    ['AskMark Budget Export', '', '', '', '', '', '', ''],
+    [budgetData.title || 'Production Budget', '', '', '', '', '', '', ''],
+    ['Market: ' + regionMeta[region].label, 'Currency: ' + currency.code, '', '', '', '', '', ''],
+    ['Generated: ' + new Date().toLocaleDateString(), '', '', '', '', '', '', ''],
+    [],
+    ['Code', 'Description', 'Basis', 'Amount (' + sym + ')', 'Tax (' + sym + ')', 'Total incl. Tax (' + sym + ')', 'Confidence', 'Notes']
+  ];
 
   budgetData.sections.forEach(s => {
     rows.push([s.code, s.name.toUpperCase(), '', '', '', '', '', '']);
     s.items.forEach(li => {
-      rows.push([li.code, li.desc, li.sub || '', fmtINR(li.amount), fmtINR(li._gst || 0), fmtINR(li._total || 0), li.conf, li.note || '']);
+      rows.push([
+        li.code, li.desc, li.sub || '',
+        Math.round(Number(li.amount)||0),
+        Math.round(li._gst||0),
+        Math.round(li._total||0),
+        li.conf, li.note || ''
+      ]);
     });
-    rows.push(['', 'SECTION TOTAL', '', '', '', fmtINR(s._total || 0), '', '']);
+    rows.push(['', 'SECTION TOTAL', '', '', '', Math.round(s._total||0), '', '']);
     rows.push([]);
   });
 
   const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [
+    {wch:8},{wch:32},{wch:24},{wch:16},{wch:14},{wch:20},{wch:10},{wch:30}
+  ];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Budget');
-  XLSX.writeFile(wb, (budgetData.title || 'AskMark_Budget') + '_Draft.xlsx');
+  XLSX.writeFile(wb, (budgetData.title || 'AskMark_Budget').replace(/[^a-zA-Z0-9_-]/g,'_') + '_Draft.xlsx');
 }
 
 function lockBudget() {
@@ -683,12 +919,6 @@ function lockBudget() {
 }
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
-function goTo(id) {
-  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
-}
-
 function showError(msg) {
   const el = document.getElementById('error-display');
   el.textContent = msg;
