@@ -588,7 +588,7 @@ async function generateQuestions(script) {
 Always ask about: 1) specific shoot locations or cities within the ${m.label} market, 2) budget scale tier (low/mid/high), 3) DOP attached or open market, 4) locations locked or estimating, 5) exact shoot days, 6) anything specific flagged by the script (stunts, VFX, choreography, etc). For location questions provide at least 4-6 specific options relevant to the ${m.label} market. Keep questions conversational not form-like.`;
 
   try {
-    const response = await callMark(systemPrompt, `Read this script and generate pre-budget questions:\n\n${script.substring(0, 6000)}`, 3000);
+    const response = await callMark(systemPrompt, `Read this script and generate pre-budget questions:\n\n${script.substring(0, 4000)}`, 1000);
     const data = parseJSON(response);
     document.getElementById('intro-text').innerHTML = data.intro;
     renderQuestions(data.questions, container);
@@ -764,7 +764,7 @@ Market: ${m.label} | Currency: ${currency.symbol} ${currency.code}
 Generate the complete itemised production budget. Be concise — quality over quantity of line items.`;
 
   try {
-    const response = await callMark(systemPrompt, userMsg, 2500);
+    const response = await callMark(systemPrompt, userMsg, 2000);
     budgetData = parseJSON(response);
     renderBudget(budgetData);
     goTo('step4');
