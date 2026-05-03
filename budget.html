@@ -66,8 +66,8 @@ input[type=file]{display:none;}
 .demo-btns{display:flex;flex-wrap:wrap;gap:8px;}
 .or-divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:10px;font-family:'DM Mono',monospace;letter-spacing:0.1em;}
 .or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border);}
-.input-section{transition:opacity 0.25s;}
-.input-section.dimmed{opacity:0.28;}
+.input-section{transition:opacity 0.2s;}
+.input-section.dimmed{opacity:0.25;pointer-events:none;cursor:default;}
 .btn-red.disabled{opacity:0.35;pointer-events:none;cursor:default;}
 
 /* STEP 2 - QUESTIONS */
@@ -288,7 +288,7 @@ input[type=file]{display:none;}
     </div>
 
     <!-- Upload zone — first -->
-    <div class="upload-zone input-section" id="upload-zone" onclick="document.getElementById('script-upload').click(); setActiveInput('upload')">
+    <div class="upload-zone input-section" id="upload-zone" onclick="document.getElementById('script-upload').click()">
       <input type="file" id="script-upload" accept=".pdf" onchange="handleFile(this)"/>
       <div id="upload-icon" style="font-size:32px;margin-bottom:10px;">📄</div>
       <div id="upload-title" style="font-size:15px;font-weight:700;color:var(--cream);margin-bottom:4px;">Upload your script</div>
@@ -513,13 +513,10 @@ let activeInput = null;
 
 function setActiveInput(type) {
   activeInput = type;
-  const ids = { upload: 'upload-zone', demo: 'demo-section', paste: 'paste-section' };
-  Object.entries(ids).forEach(([key, id]) => {
-    const el = document.getElementById(id);
-    if (el) el.classList.toggle('dimmed', key !== type);
-  });
-  const btn = document.getElementById('build-btn');
-  if (btn) btn.classList.remove('disabled');
+  document.getElementById('upload-zone').classList.toggle('dimmed', type !== 'upload');
+  document.getElementById('demo-section').classList.toggle('dimmed', type !== 'demo');
+  document.getElementById('paste-section').classList.toggle('dimmed', type !== 'paste');
+  document.getElementById('build-btn').classList.remove('disabled');
 }
 
 function resetInputSections() {
