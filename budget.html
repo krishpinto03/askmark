@@ -937,38 +937,121 @@ function toggleSec(id) {
 // ── EXPORT EXCEL ──────────────────────────────────────────────────────────────
 function exportExcel() {
   if(!budgetData) { alert('No budget to export yet.'); return; }
-  const sym = currency.symbol;
-  const rows = [
-    ['AskMark Budget Export', '', '', '', '', '', '', ''],
-    [budgetData.title || 'Production Budget', '', '', '', '', '', '', ''],
-    ['Market: ' + regionMeta[region].label, 'Currency: ' + currency.code, '', '', '', '', '', ''],
-    ['Generated: ' + new Date().toLocaleDateString(), '', '', '', '', '', '', ''],
-    [],
-    ['Code', 'Description', 'Basis', 'Amount (' + sym + ')', 'Tax (' + sym + ')', 'Total incl. Tax (' + sym + ')', 'Confidence', 'Notes']
-  ];
 
-  budgetData.sections.forEach(s => {
-    rows.push([s.code, s.name.toUpperCase(), '', '', '', '', '', '']);
+  const sym = currency.symbol;
+  const cod = currency.code;
+  const m = regionMeta[region];
+  const title = budgetData.title || 'Production Budget';
+  const locs = (budgetData.locations || []).join(' · ') || m.label;
+  const shootDays = budgetData.shoot_days || '';
+
+  // Group sections
+  const atl  = budgetData.sections.filter(s => s.type === 'above_the_line');
+  const btl  = budgetData.sections.filter(s => s.type === 'below_the_line');
+  const post = budgetData.sections.filter(s => s.type !== 'above_the_line' && s.type !== 'below_the_line');
+
+  function grpSums(secs) {
+    return secs.reduce((acc, s) => {
+      const a = s.items.reduce((t, li) => t + (Number(li.amount)||0), 0);
+      const g = s.items.reduce((t, li) => t + (li._gst||0), 0);
+      return { amt: acc.amt + a, gst: acc.gst + g };
+    }, { amt:0, gst:0 });
+  }
+
+  const atlS = grpSums(atl), btlS = grpSums(btl), postS = grpSums(post);
+  const insAmt = Math.round((atlS.amt + btlS.amt) * 0.01);
+  const insGst = Math.round(insAmt * 0.18);
+  const contAmt = Math.round((atlS.amt + btlS.amt) * 0.10);
+  const grandTotal = atlS.amt + atlS.gst + btlS.amt + btlS.gst + postS.amt + postS.gst + insAmt + insGst + contAmt;
+
+  // ── SHEET 1: TOP SHEET ──────────────────────────────────────────────────────
+  const T = [];
+  T.push(['', 'SUMMARY SHEET - ' + title.toUpperCase(), 'ACTIVITY', 'MONTHS', 'LOCATION', 'SHOOT DAYS', '', '']);
+  T.push(['', '', 'PRE PRODUCTION', '', locs, shootDays, '', '']);
+  T.push(['', '', 'SHOOT', '', '', '', '', '']);
+  T.push(['', '', 'POST PRODUCTION', '', '', '', '', '']);
+  T.push([]);
+  T.push(['CODE', 'EXPENSE HEAD', 'FIXED', 'VARIABLE', 'TOTAL', 'GST / VAT', 'GRAND TOTAL', '']);
+
+  function tRow(s) {
+    const a = s.items.reduce((t,li) => t+(Number(li.amount)||0), 0);
+    const g = s.items.reduce((t,li) => t+(li._gst||0), 0);
+    T.push([s.code, s.name.toUpperCase(), '', a, a, g, a+g, '']);
+  }
+  function tTotal(label, sums) {
+    T.push(['', label, '', sums.amt, sums.amt, sums.gst, sums.amt+sums.gst, '']);
+  }
+
+  atl.forEach(tRow);
+  tTotal('TOTAL ABOVE THE LINE', atlS);
+  btl.forEach(tRow);
+  tTotal('TOTAL BELOW THE LINE', btlS);
+  post.forEach(tRow);
+  tTotal('TOTAL POST PRODUCTION', postS);
+  T.push(['13700', 'INSURANCE', '', insAmt, insAmt, insGst, insAmt+insGst, '']);
+  T.push(['14000', 'CONTINGENCY (10%)', '', contAmt, contAmt, 0, contAmt, '']);
+  T.push([]);
+  T.push(['', 'GRAND TOTAL (' + sym + ' ' + cod + ')', '', '', '', '', grandTotal, '']);
+  T.push([]);
+  T.push(['', 'Market: ' + m.label + '  |  Currency: ' + sym + ' ' + cod + '  |  AI Draft generated: ' + new Date().toLocaleDateString('en-GB'), '', '', '', '', '', '']);
+  if(budgetData.excluded && budgetData.excluded.length) {
+    T.push(['', 'EXCLUDED FROM BUDGET: ' + budgetData.excluded.join(', '), '', '', '', '', '', '']);
+  }
+
+  const ws1 = XLSX.utils.aoa_to_sheet(T);
+  ws1['!cols'] = [{wch:8},{wch:38},{wch:14},{wch:16},{wch:16},{wch:16},{wch:18},{wch:4}];
+
+  // ── SHEET 2: DETAILED BUDGET ────────────────────────────────────────────────
+  const D = [];
+  D.push(['', 'DETAILED BUDGET - ' + title.toUpperCase(), 'ACTIVITY', 'MONTHS', '', 'LOCATION', 'SHOOT DAYS', '', '', '', '', '', '', '', '']);
+  D.push(['', '', 'SHOOT', '', '', locs, shootDays, '', '', '', '', '', '', '', '']);
+  D.push([]);
+  D.push(['BUDGET CODE','BUDGET HEADS','MAJOR HEAD','LOCATION','BASIS','DAYS / MONTHS','UOM','X','CURRENCY','RATE','AMOUNT','TOTAL AMOUNT','TAX','SUB-TOTAL','REMARKS / CONFIDENCE']);
+
+  function addSec(s) {
+    D.push([s.code, s.name.toUpperCase(), s.name.toUpperCase(), '', '', '', '', '', '', '', '', '', '', '', '']);
     s.items.forEach(li => {
-      rows.push([
-        li.code, li.desc, li.sub || '',
-        Math.round(Number(li.amount)||0),
-        Math.round(li._gst||0),
-        Math.round(li._total||0),
-        li.conf, li.note || ''
+      const a = Number(li.amount)||0;
+      const g = li._gst||0;
+      const conf = li.conf !== 'green' ? '[' + (li.conf||'').toUpperCase() + '] ' : '';
+      D.push([
+        li.code, li.desc, s.name.toUpperCase(),
+        locs.split(' · ')[0] || m.label,
+        'LUMPSUM', 1, 'LUMPSUM', 1, cod,
+        a, a, a, g, a+g,
+        conf + (li.note || li.sub || '')
       ]);
     });
-    rows.push(['', 'SECTION TOTAL', '', '', '', Math.round(s._total||0), '', '']);
-    rows.push([]);
-  });
+    const sa = s.items.reduce((t,li) => t+(Number(li.amount)||0), 0);
+    const sg = s.items.reduce((t,li) => t+(li._gst||0), 0);
+    D.push(['', 'ACCOUNT TOTAL FOR ' + s.code, s.name.toUpperCase(), '', '', '', '', '', '', '', '', sa, sg, sa+sg, '']);
+    D.push([]);
+  }
 
-  const ws = XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols'] = [
-    {wch:8},{wch:32},{wch:24},{wch:16},{wch:14},{wch:20},{wch:10},{wch:30}
+  atl.forEach(addSec);
+  D.push(['', 'TOTAL ABOVE THE LINE', '', '', '', '', '', '', '', '', '', atlS.amt, atlS.gst, atlS.amt+atlS.gst, '']);
+  D.push([]);
+  btl.forEach(addSec);
+  D.push(['', 'TOTAL BELOW THE LINE', '', '', '', '', '', '', '', '', '', btlS.amt, btlS.gst, btlS.amt+btlS.gst, '']);
+  D.push([]);
+  post.forEach(addSec);
+  D.push(['', 'TOTAL POST PRODUCTION', '', '', '', '', '', '', '', '', '', postS.amt, postS.gst, postS.amt+postS.gst, '']);
+  D.push([]);
+  D.push(['13700','INSURANCE (1%)','INSURANCE','','','','','','',cod,insAmt,insAmt,insGst,insAmt+insGst,'']);
+  D.push(['14000','CONTINGENCY (10%)','CONTINGENCY','','','','','','',cod,contAmt,contAmt,0,contAmt,'']);
+  D.push([]);
+  D.push(['','GRAND TOTAL (' + sym + ' ' + cod + ')','','','','','','','','','','','',grandTotal,'']);
+
+  const ws2 = XLSX.utils.aoa_to_sheet(D);
+  ws2['!cols'] = [
+    {wch:10},{wch:34},{wch:28},{wch:16},{wch:10},{wch:12},{wch:8},{wch:4},
+    {wch:8},{wch:14},{wch:14},{wch:14},{wch:12},{wch:16},{wch:30}
   ];
+
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Budget');
-  XLSX.writeFile(wb, (budgetData.title || 'AskMark_Budget').replace(/[^a-zA-Z0-9_-]/g,'_') + '_Draft.xlsx');
+  XLSX.utils.book_append_sheet(wb, ws1, 'Top Sheet');
+  XLSX.utils.book_append_sheet(wb, ws2, 'Detailed Budget');
+  XLSX.writeFile(wb, title.replace(/[^a-zA-Z0-9_\-\s]/g,'_') + '_AskMark_Budget.xlsx');
 }
 
 function lockBudget() {
