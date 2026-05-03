@@ -346,17 +346,15 @@ input[type=file]{display:none;}
       <div class="gen-title">Mark is building your budget</div>
       <div style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;" id="gen-subtitle">Applying market rate card · Budget codes 10000–14000</div>
       <div style="display:flex;gap:8px;justify-content:center;margin:14px 0;">
-        <span style="font-size:9px;font-family:'DM Mono',monospace;padding:3px 8px;background:rgba(200,51,10,0.15);color:#F2A088;letter-spacing:0.06em;">Qwen3 Coder 480B</span>
-        <span style="font-size:9px;color:var(--muted);">+</span>
-        <span style="font-size:9px;font-family:'DM Mono',monospace;padding:3px 8px;background:rgba(59,106,253,0.12);color:#7B9EFF;letter-spacing:0.06em;">DeepSeek R1</span>
+        <span style="font-size:9px;font-family:'DM Mono',monospace;padding:3px 8px;background:rgba(52,168,83,0.12);color:#6BCF8A;letter-spacing:0.06em;">● Free AI Engine</span>
       </div>
       <div class="gen-steps">
-        <div class="gs active" id="gs1"><div class="gs-dot"></div><span style="color:var(--muted);font-size:9px;margin-right:6px;">Qwen3</span>Ingesting full script — 262K context</div>
-        <div class="gs" id="gs2"><div class="gs-dot"></div><span style="color:var(--muted);font-size:9px;margin-right:6px;">Qwen3</span>Extracting production elements into JSON</div>
-        <div class="gs" id="gs3"><div class="gs-dot"></div><span style="color:var(--muted);font-size:9px;margin-right:6px;">R1</span>Reasoning through cost interdependencies</div>
-        <div class="gs" id="gs4"><div class="gs-dot"></div><span style="color:var(--muted);font-size:9px;margin-right:6px;">R1</span>Applying location &amp; scale-adjusted rates</div>
-        <div class="gs" id="gs5"><div class="gs-dot"></div><span style="color:var(--muted);font-size:9px;margin-right:6px;">R1</span>Calculating taxes, contingency &amp; insurance</div>
-        <div class="gs" id="gs6"><div class="gs-dot"></div><span style="color:var(--muted);font-size:9px;margin-right:6px;">R1</span>Flagging amber &amp; red confidence items</div>
+        <div class="gs active" id="gs1"><div class="gs-dot"></div>Ingesting script and brief</div>
+        <div class="gs" id="gs2"><div class="gs-dot"></div>Extracting production elements</div>
+        <div class="gs" id="gs3"><div class="gs-dot"></div>Reasoning through cost interdependencies</div>
+        <div class="gs" id="gs4"><div class="gs-dot"></div>Applying location &amp; scale-adjusted rates</div>
+        <div class="gs" id="gs5"><div class="gs-dot"></div>Calculating taxes, contingency &amp; insurance</div>
+        <div class="gs" id="gs6"><div class="gs-dot"></div>Flagging amber &amp; red confidence items</div>
       </div>
     </div>
   </div>
@@ -511,7 +509,7 @@ async function generateQuestions(script) {
 Always ask about: 1) specific shoot locations or cities within the ${m.label} market, 2) budget scale tier (low/mid/high), 3) DOP attached or open market, 4) locations locked or estimating, 5) exact shoot days, 6) anything specific flagged by the script (stunts, VFX, choreography, etc). For location questions provide at least 4-6 specific options relevant to the ${m.label} market. Keep questions conversational not form-like.`;
 
   try {
-    const response = await callMark(systemPrompt, `Read this script and generate pre-budget questions:\n\n${script.substring(0, 6000)}`, 3000, 'parse');
+    const response = await callMark(systemPrompt, `Read this script and generate pre-budget questions:\n\n${script.substring(0, 6000)}`, 3000);
     const data = parseJSON(response);
     document.getElementById('intro-text').innerHTML = data.intro;
     renderQuestions(data.questions, container);
@@ -631,9 +629,7 @@ async function submitAnswers() {
 function runAnimation() {
   const steps = ['gs1','gs2','gs3','gs4','gs5','gs6'];
   let i = 0;
-  // Steps 1-2 are Qwen3 (fast ~5s), steps 3-6 are DeepSeek R1 (slower reasoning)
-  const delays = [2000, 4000, 7000, 7000, 7000, 7000];
-  function advance() {
+  const iv = setInterval(() => {
     if(i > 0) {
       const prev = document.getElementById(steps[i-1]);
       prev.classList.remove('active');
@@ -643,12 +639,11 @@ function runAnimation() {
     }
     if(i < steps.length) {
       document.getElementById(steps[i]).classList.add('active');
-      const delay = delays[i] || 7000;
       i++;
-      setTimeout(advance, delay);
+    } else {
+      clearInterval(iv);
     }
-  }
-  advance();
+  }, 8000);
 }
 
 async function generateBudget(apiKey) {
@@ -711,7 +706,7 @@ Market: ${m.label} | Currency: ${currency.symbol} ${currency.code}
 Generate the complete itemised production budget. Be concise — quality over quantity of line items.`;
 
   try {
-    const response = await callMark(systemPrompt, userMsg, 4000, 'budget');
+    const response = await callMark(systemPrompt, userMsg, 4000);
     budgetData = parseJSON(response);
     renderBudget(budgetData);
     goTo('step4');
@@ -725,17 +720,14 @@ Generate the complete itemised production budget. Be concise — quality over qu
 }
 
 // ── MARK API CALL ─────────────────────────────────────────────────────────────
-// stage='parse'  → Qwen3 Coder 480B (262K context, JSON extraction)
-// stage='budget' → DeepSeek R1       (chain-of-thought cost reasoning)
-async function callMark(system, user, maxTokens = 3000, stage = 'parse') {
+async function callMark(system, user, maxTokens = 3000) {
   const controller = new AbortController();
-  const timeoutMs = stage === 'budget' ? 58000 : 45000;
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  const timeout = setTimeout(() => controller.abort(), 55000);
   try {
     const resp = await fetch('https://askmark-proxy.vercel.app/api/claude', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ system, user, max_tokens: maxTokens, stage }),
+      body: JSON.stringify({ system, user, max_tokens: maxTokens }),
       signal: controller.signal
     });
     clearTimeout(timeout);
