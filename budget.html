@@ -220,33 +220,46 @@ input[type=file]{display:none;}
 
     <div class="region-grid">
       <div class="region-card" id="rc-india" onclick="selectRegion('india','₹','INR','Indian Rupee')">
-        <div class="region-icon">🎬</div>
         <div class="region-name">Indian Cinema</div>
-        <div class="region-sub">Bollywood · OTT · TVC<br/>Budget codes 10000–14000 · GST</div>
+        <div class="region-sub">Bollywood · South India</div>
         <div class="region-badge">₹ INR</div>
       </div>
       <div class="region-card" id="rc-hollywood" onclick="selectRegion('hollywood','$','USD','US Dollar')">
-        <div class="region-icon">🎥</div>
         <div class="region-name">Hollywood / North America</div>
-        <div class="region-sub">Feature Film · TV · Streaming<br/>Union & non-union rates</div>
         <div class="region-badge">$ USD</div>
       </div>
       <div class="region-card" id="rc-uk" onclick="selectRegion('uk','£','GBP','British Pound')">
-        <div class="region-icon">🎭</div>
         <div class="region-name">UK & Europe</div>
-        <div class="region-sub">Film · TV · Commercials<br/>PACT / Indie rates</div>
         <div class="region-badge">£ GBP</div>
       </div>
-      <div class="region-card" id="rc-other" onclick="selectRegion('other','$','USD','US Dollar')">
-        <div class="region-icon">🌍</div>
-        <div class="region-name">Other / International</div>
-        <div class="region-sub">Global co-productions<br/>Enter your own rates</div>
-        <div class="region-badge">$ USD</div>
+      <div class="region-card" id="rc-other" onclick="selectRegion('other','','','')">
+        <div class="region-name">Other</div>
+        <div class="region-sub">Input custom industry and currency</div>
+        <div class="region-badge" id="rc-other-badge">Custom</div>
+      </div>
+    </div>
+
+    <!-- Custom inputs — shown only when Other is selected -->
+    <div id="custom-inputs" style="display:none;margin-top:16px;background:var(--s1);border:1px solid var(--border);padding:20px;display:none;">
+      <div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:14px;">Your Industry & Currency</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <div>
+          <label style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;display:block;margin-bottom:6px;">Industry / Market *</label>
+          <input id="custom-industry" type="text" placeholder="e.g. Korean Cinema" oninput="updateCustomRegion()" style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--cream);font-family:'Syne',sans-serif;font-size:13px;padding:9px 12px;outline:none;"/>
+        </div>
+        <div>
+          <label style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;display:block;margin-bottom:6px;">Currency Symbol *</label>
+          <input id="custom-symbol" type="text" placeholder="e.g. €" maxlength="3" oninput="updateCustomRegion()" style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--cream);font-family:'Syne',sans-serif;font-size:13px;padding:9px 12px;outline:none;"/>
+        </div>
+        <div>
+          <label style="font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);font-family:'DM Mono',monospace;display:block;margin-bottom:6px;">Currency Code *</label>
+          <input id="custom-code" type="text" placeholder="e.g. EUR" maxlength="5" oninput="updateCustomRegion()" style="width:100%;background:var(--s2);border:1px solid var(--border);color:var(--cream);font-family:'Syne',sans-serif;font-size:13px;padding:9px 12px;outline:none;text-transform:uppercase;"/>
+        </div>
       </div>
     </div>
 
     <div style="margin-top:20px;display:flex;justify-content:flex-end;">
-      <button class="btn-red" id="market-next-btn" onclick="goTo('step1')" style="opacity:0.4;pointer-events:none;">Continue →</button>
+      <button class="btn-red" id="market-next-btn" onclick="proceedFromMarket()" style="opacity:0.4;pointer-events:none;">Continue →</button>
     </div>
   </div>
 
@@ -411,9 +424,47 @@ function selectRegion(r, sym, code, name) {
   currency = { symbol: sym, code, name };
   document.querySelectorAll('.region-card').forEach(c => c.classList.remove('sel'));
   document.getElementById('rc-' + r).classList.add('sel');
+
+  const customBox = document.getElementById('custom-inputs');
+  if (r === 'other') {
+    customBox.style.display = 'block';
+    updateCustomRegion();
+  } else {
+    customBox.style.display = 'none';
+    const btn = document.getElementById('market-next-btn');
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+  }
+}
+
+function updateCustomRegion() {
+  const industry = document.getElementById('custom-industry').value.trim();
+  const sym = document.getElementById('custom-symbol').value.trim();
+  const code = document.getElementById('custom-code').value.trim().toUpperCase();
+  const ready = industry && sym && code;
   const btn = document.getElementById('market-next-btn');
-  btn.style.opacity = '1';
-  btn.style.pointerEvents = 'auto';
+  btn.style.opacity = ready ? '1' : '0.4';
+  btn.style.pointerEvents = ready ? 'auto' : 'none';
+  if (ready) {
+    currency = { symbol: sym, code, name: industry };
+    document.getElementById('rc-other-badge').textContent = sym + ' ' + code;
+  }
+}
+
+function proceedFromMarket() {
+  if (region === 'other') {
+    const industry = document.getElementById('custom-industry').value.trim();
+    const sym = document.getElementById('custom-symbol').value.trim();
+    const code = document.getElementById('custom-code').value.trim().toUpperCase();
+    if (!industry || !sym || !code) return;
+    currency = { symbol: sym, code, name: industry };
+    regionMeta['other'] = {
+      icon: '',
+      label: industry,
+      currencyLabel: sym + ' ' + code + ' — ' + industry,
+    };
+  }
+  goTo('step1');
 }
 
 // ── RESTORE SAVED API KEY ─────────────────────────────────────────────────────
